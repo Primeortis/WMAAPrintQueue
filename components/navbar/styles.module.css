@@ -1,0 +1,21 @@
+.container {
+    display:flex;
+    left:0;
+    width: 4vw;
+    height:100vh;
+    background-color: #2463E0;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    align-content:flex-start;
+}
+
+.container svg {
+    transition:0.5s;
+    border-radius: 100%;
+    cursor:pointer;
+}
+
+.container svg:hover {
+    background-color:rgba(240, 240, 240, 0.7);
+}

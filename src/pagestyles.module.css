@@ -1,0 +1,18 @@
+.body {
+    width: 96vw;
+    position:absolute;
+    top:0;
+    right:0;
+    text-align: center;
+    color:black;
+}
+
+.popout {
+    background-color: #FAFAFA;
+    width: 40%;
+    margin:auto;
+    border-radius: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right:5px;
+}
