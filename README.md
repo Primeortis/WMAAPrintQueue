@@ -1,4 +1,12 @@
-# React + Vite
+# WMAA Print and Queue Portal
+*A portal designed to help queue prints from students, provide access control, among other features*
+
+Development currently underway
+
+
+
+
+# Templating: React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
