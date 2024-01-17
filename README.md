@@ -3,7 +3,11 @@
 
 Development currently underway
 
-
+# Setting up the development environment
+1. Clone the repository
+2. Install bun [here](https://bun.sh)
+3. Install dependencies in package.json (bun install)
+4. View development build (bun dev)
 
 
 # Templating: React + Vite
