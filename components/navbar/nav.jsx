@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./styles.module.css";
+import { Tooltip } from "@mui/material";
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HistoryIcon from '@mui/icons-material/History';
@@ -19,12 +20,29 @@ class Navbar extends React.Component {
         return (
             <nav className={styles.container}>
                 <img style={iconStyles} src="/wmaa.png"/>
+                <Tooltip title="Profile" placement="right">
                 <AccountCircleIcon sx={iconStyles}/>
+                </Tooltip>
+                <Tooltip title="Printer Status" placement="right">
                 <HistoryIcon sx={iconStyles}/>
+                </Tooltip>
+                <Tooltip title="Files" placement="right">
                 <AttachFileIcon sx={iconStyles}/>
-                <LibraryAddIcon sx={iconStyles}/>
-                <NotificationsIcon sx={iconStyles}/>
-                {this.props.admin?<SecurityIcon sx={iconStyles} />:null}
+                </Tooltip>
+                <Tooltip title="New Print" placement="right">
+                <LibraryAddIcon sx={iconStyles}/>    
+                </Tooltip>
+                <Tooltip title="Messages" placement="right">
+                <NotificationsIcon sx={iconStyles}/>    
+                </Tooltip>
+                
+                {this.props.admin?
+                <>
+                <Tooltip title="Admin" placement="right">
+                <SecurityIcon sx={iconStyles} />
+                </Tooltip>
+                </>
+                :null}
             </nav>
         );
     }
