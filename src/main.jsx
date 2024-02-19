@@ -6,6 +6,7 @@ import PausedPage from './pages/paused.jsx'
 import './index.css'
 
 import AuthPage from './pages/auth.jsx'
+import ProfilePage from './pages/profile.jsx'
 
 import {
   createBrowserRouter,
@@ -16,6 +17,11 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App/>,
+    errorElement: <Error/>
+  },
+  {
+    path: "/profile",
+    element: <ProfilePage/>,
     errorElement: <Error/>
   },
   {
