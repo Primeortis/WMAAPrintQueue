@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css"
+import { Link } from "react-router-dom";
 
 
 function File(props){
@@ -24,7 +25,7 @@ export default function FilesPage(props){
               <h2 align="center">Your Files</h2>
               <File name={"first print"} date={"Sat 11/4/2023 11:37PM"}/>
               <br/>
-              <Button variant={"contained"} sx={{display:"block", margin:"auto"}}>Create New File</Button>
+              <Button variant={"contained"} sx={{display:"block", margin:"auto", width: "fit-content"}} component={Link} to={"/file/new"}>Create New File</Button>
               <br/>
             </div>
           </div>

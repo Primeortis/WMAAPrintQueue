@@ -40,3 +40,25 @@
 .dimOnHover:hover {
     background-color: #F0F0f0;
 }
+
+.leftHalfScreen {
+    width: 45%;
+    margin-left: 5px;
+    margin-right: 5px;
+    left:0;
+    padding-left:10px;
+    
+}
+
+.rightHalfScreen {
+    position: relative;
+    right: 0;
+    width: 45%;
+    margin-left: 5px;
+    margin-right: 5px;
+    text-align: center;
+}
+
+.charactersRemaining {
+    font-size:0.7em;
+}

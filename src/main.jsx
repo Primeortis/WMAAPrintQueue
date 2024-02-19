@@ -9,11 +9,13 @@ import AuthPage from './pages/auth.jsx'
 import ProfilePage from './pages/profile.jsx'
 import PrinterStatus from './pages/printer_status.jsx'
 import FilesPage from './pages/files.jsx'
+import NewFilePage from './pages/new_file.jsx'
 
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+
 
 
 const router = createBrowserRouter([
@@ -35,6 +37,11 @@ const router = createBrowserRouter([
   {
     path: "/file",
     element: <FilesPage/>,
+    errorElement: <Error/>
+  },
+  {
+    path: "/file/new",
+    element: <NewFilePage/>,
     errorElement: <Error/>
   },
   {
