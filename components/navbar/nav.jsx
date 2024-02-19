@@ -32,7 +32,9 @@ class Navbar extends React.Component {
                 </IconButton>
                 </Tooltip>
                 <Tooltip title="Files" placement="right">
-                <AttachFileIcon sx={iconStyles}/>
+                    <IconButton component={Link} to={"/file"}>
+                    <AttachFileIcon sx={iconStyles}/>
+                    </IconButton>
                 </Tooltip>
                 <Tooltip title="New Print" placement="right">
                 <LibraryAddIcon sx={iconStyles}/>    

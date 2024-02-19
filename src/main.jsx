@@ -8,6 +8,7 @@ import './index.css'
 import AuthPage from './pages/auth.jsx'
 import ProfilePage from './pages/profile.jsx'
 import PrinterStatus from './pages/printer_status.jsx'
+import FilesPage from './pages/files.jsx'
 
 import {
   createBrowserRouter,
@@ -29,6 +30,11 @@ const router = createBrowserRouter([
   {
     path: "/status",
     element: <PrinterStatus/>,
+    errorElement: <Error/>
+  },
+  {
+    path: "/file",
+    element: <FilesPage/>,
     errorElement: <Error/>
   },
   {
