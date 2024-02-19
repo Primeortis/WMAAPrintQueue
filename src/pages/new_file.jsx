@@ -1,6 +1,7 @@
 import { Button, Select, TextField } from "@mui/material";
 import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css"
+import { Link } from "react-router-dom";
 
 
 
@@ -22,12 +23,13 @@ export default function NewFilePage(props){
                     <Button>Clear All</Button>
                 </div>
                 <div className={styles.rightHalfScreen}>
-                    <div style={{backgroundColor:"#DADADA", cursor:"pointer"}}>
+                    <div style={{backgroundColor:"#DADADA", cursor:"pointer", height:"60%"}}>
                         <p>Select Your File</p>
                     </div>
                 </div>
                 </div>
-                <Button variant="contained">Submit</Button>
+                <Button variant="contained" component={Link} to={"/file"} sx={{marginRight:"10px"}}>Back</Button>
+                <Button variant="contained">Upload</Button>
             </div>
           </div>
         </>
