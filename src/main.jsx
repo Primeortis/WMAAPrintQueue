@@ -7,11 +7,13 @@ import './index.css'
 
 import AuthPage from './pages/auth.jsx'
 import ProfilePage from './pages/profile.jsx'
+import PrinterStatus from './pages/printer_status.jsx'
 
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,11 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: <ProfilePage/>,
+    errorElement: <Error/>
+  },
+  {
+    path: "/status",
+    element: <PrinterStatus/>,
     errorElement: <Error/>
   },
   {

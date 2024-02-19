@@ -12,7 +12,29 @@
     width: 40%;
     margin:auto;
     border-radius: 10px;
+    padding-top:3px;
     padding-bottom: 10px;
     padding-left: 5px;
     padding-right:5px;
 }
+
+.rows {
+    display:flex;
+    padding:0px 10px;
+    margin:1vw;
+    border-color: #8C8C8C;
+    border-width:1px;
+    border-style: solid;
+    
+}
+
+.rows p{
+    vertical-align: middle;
+    width: 50%;
+}
+
+.emP {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
