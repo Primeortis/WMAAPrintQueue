@@ -6,12 +6,12 @@ import { Link } from "react-router-dom";
 
 function File(props){
   return (
-    <div className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer"}}>
+    <Link className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} to={"/file/"+props.id}>
         <p className={styles.emP}>{props.name}</p>
         <p>
             <i>{props.date}</i>
         </p>
-    </div>
+    </Link>
   )
 }
 
@@ -23,7 +23,7 @@ export default function FilesPage(props){
             <h1>Your Files</h1>
             <div className={styles.popout} style={{textAlign:"left"}}>
               <h2 align="center">Your Files</h2>
-              <File name={"first print"} date={"Sat 11/4/2023 11:37PM"}/>
+              <File name={"first print"} date={"Sat 11/4/2023 11:37PM"} id={"sl"}/>
               <br/>
               <Button variant={"contained"} sx={{display:"block", margin:"auto", width: "fit-content"}} component={Link} to={"/file/new"}>Create New File</Button>
               <br/>
