@@ -10,6 +10,8 @@ import ProfilePage from './pages/profile.jsx'
 import PrinterStatus from './pages/printer_status.jsx'
 import FilesPage from './pages/files.jsx'
 import NewFilePage from './pages/new_file.jsx'
+import ExistingFilePage from './pages/existing_file.jsx'
+
 
 import {
   createBrowserRouter,
@@ -42,6 +44,11 @@ const router = createBrowserRouter([
   {
     path: "/file/new",
     element: <NewFilePage/>,
+    errorElement: <Error/>
+  },
+  {
+    path: "/file/:id",
+    element: <ExistingFilePage/>,
     errorElement: <Error/>
   },
   {

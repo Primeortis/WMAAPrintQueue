@@ -24,7 +24,7 @@ export default function NewFilePage(props){
                 </div>
                 <div className={styles.rightHalfScreen}>
                     <div style={{backgroundColor:"#DADADA", cursor:"pointer", height:"60%"}}>
-                        <p>Select Your File</p>
+                        <p>Click to select your file, or drag it into this rectangle</p>
                     </div>
                 </div>
                 </div>
