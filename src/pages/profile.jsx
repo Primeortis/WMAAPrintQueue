@@ -16,15 +16,18 @@ export default function ProfilePage(props){
           alert("There was an error signing you out. Try again.")
         })
     }
+
+    let userInformation = auth.currentUser;
+    console.log(userInformation);
     return (
         <>
           <Navbar admin={true}/>
           <div className={styles.body} style={{paddingTop:"10vh"}}>
-            <h1>Hello Bryson!</h1>
+            <h1>Hello {userInformation.displayName}!</h1>
             <div className={styles.popout} style={{textAlign:"left"}}>
-              <p>Email: email@email.com</p>
-              <p>User ID: sldkfjwoeiurjsdjflwlskdjflsdfkj (Click to Copy)</p>
-              <p>Status: Administrator</p>
+              <p>Email: {userInformation.email}</p>
+              <p>User ID: {userInformation.uid} (Click to Copy)</p>
+              <p>Status: tbd</p>
               <Button variant="contained" onClick={signOutButton}>Sign Out</Button>
             </div>
           </div>
