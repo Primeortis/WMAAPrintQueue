@@ -10,7 +10,7 @@ Development currently underway
 4. View development build (bun dev)
 
 
-# Templating: React + Vite
+# Stuff from Start Vite App: React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
