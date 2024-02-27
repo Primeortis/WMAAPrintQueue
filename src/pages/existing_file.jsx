@@ -35,7 +35,7 @@ export default function ExistingFilePage(props){
                         <DeleteIcon sx={iconButtonStyles}/>
                       </IconButton>
 
-                      <IconButton>
+                      <IconButton component={Link} to={"/file/"+(window.location.pathname.split("/").slice(-1))+"/edit"}>
                         <EditIcon sx={iconButtonStyles}/>
                       </IconButton>
                     </div>

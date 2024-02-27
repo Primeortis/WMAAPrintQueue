@@ -52,6 +52,11 @@ const router = createBrowserRouter([
     errorElement: <Error/>
   },
   {
+    path: "/file/:id/edit",
+    element: <NewFilePage/>,
+    errorElement: <Error/>
+  },
+  {
     path:"/auth",
     element:<AuthPage/>,
     errorElement: <Error/>
