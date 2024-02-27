@@ -11,7 +11,7 @@ import PrinterStatus from './pages/printer_status.jsx'
 import FilesPage from './pages/files.jsx'
 import NewFilePage from './pages/new_file.jsx'
 import ExistingFilePage from './pages/existing_file.jsx'
-
+import AdminPage from './pages/admin.jsx'
 
 import {
   createBrowserRouter,
@@ -64,6 +64,11 @@ const router = createBrowserRouter([
   {
     path:"/paused",
     element:<PausedPage/>,
+    errorElement:<Error/>
+  },
+  {
+    path:"/admin",
+    element:<AdminPage/>,
     errorElement:<Error/>
   }
 ]);
