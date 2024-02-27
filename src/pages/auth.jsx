@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useState } from "react";
 import Parent from "../../components/basic/parent";
 import {firebaseApp} from "../../src/firebase-config.js"
-import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth"
+import {getAuth, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence} from "firebase/auth"
 
 export default function AuthPage(props){
     const navigate = useNavigate();
@@ -11,16 +11,21 @@ export default function AuthPage(props){
     const auth = getAuth(firebaseApp);
     const provider = new GoogleAuthProvider();
     function onButtonClicked(){
-        signInWithPopup(auth, provider).then((result)=> {
-            let user = result.user;
-            navigate("/")
+        setPersistence(auth, browserLocalPersistence).then(()=> {
+            signInWithPopup(auth, provider).then((result)=> {
+                let user = result.user;
+                navigate("/")
+            }).catch((error)=> {
+                let errorMessage = error.message;
+                setError(errorMessage);
+                setTimeout(()=> {
+                    setError(false);
+                },10000);
+            })
         }).catch((error)=> {
-            let errorMessage = error.message;
-            setError(errorMessage);
-            setTimeout(()=> {
-                setError(false);
-            },10000);
+            alert("something went wrong")
         })
+        
     }
     return (
         <Parent>
