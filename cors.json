@@ -1,0 +1,8 @@
+[ 
+    {
+      "_comment:": "This adjusts CORS settings on Google Cloud (firebase storage)",
+      "origin": ["http://127.0.0.1:5173", "https://wmaaprinting.web.app"],
+      "method": ["GET"],
+      "maxAgeSeconds": 3600
+    }
+]
