@@ -78,7 +78,7 @@ export default function ExistingFilePage(props){
                 </div>
                 <div className={styles.rightHalfScreen} style={{backgroundColor: "#FAFAFA"}}>
                   {stlURL!= null?
-                    <StlViewer orbitControls url={stlURL}/>
+                    <StlViewer orbitControls url={stlURL} style={{height: "30vh"}}/>
                     :null
                   }
                   <p><i>Pro Tip: Click and drag the model around to preview!</i></p>
