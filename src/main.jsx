@@ -12,6 +12,10 @@ import FilesPage from './pages/files.jsx'
 import NewFilePage from './pages/new_file.jsx'
 import ExistingFilePage from './pages/existing_file.jsx'
 import AdminPage from './pages/admin.jsx'
+import UserManagementPage from './pages/admin/userManagement.jsx'
+import QueueManagementPage from './pages/admin/queueManagement.jsx'
+import FileViewerPage from './pages/admin/viewAllFiles.jsx'
+import PrintViewerPage from './pages/admin/viewAllPrints.jsx'
 
 import {
   createBrowserRouter,
@@ -70,7 +74,27 @@ const router = createBrowserRouter([
     path:"/admin",
     element:<AdminPage/>,
     errorElement:<Error/>
-  }
+  },
+  {
+    path:"/admin/usermanagement",
+    element:<UserManagementPage/>,
+    errorElement:<Error/>
+  },
+  {
+    path:"/admin/queuemanagement",
+    element:<QueueManagementPage/>,
+    errorElement:<Error/>
+  },
+  {
+    path:"/admin/fileviewer",
+    element:<FileViewerPage/>,
+    errorElement:<Error/>
+  }/*,
+  {
+    path:"/admin/printviewer",
+    element:<PrintViewerPage>,
+    errorElement:<Error/>
+  }//*/
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
