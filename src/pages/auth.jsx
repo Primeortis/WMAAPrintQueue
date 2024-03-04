@@ -14,7 +14,8 @@ export default function AuthPage(props){
         setPersistence(auth, browserLocalPersistence).then(()=> {
             signInWithPopup(auth, provider).then((result)=> {
                 let user = result.user;
-                navigate("/")
+                let params = new URLSearchParams(window.location.search);
+                if(params.get("rd")&&params.get("rd")!="/auth"){navigate(params.get("rd"))}else{navigate("/")}
             }).catch((error)=> {
                 let errorMessage = error.message;
                 setError(errorMessage);
