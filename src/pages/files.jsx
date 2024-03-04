@@ -1,4 +1,4 @@
-import { Button, CircularProgress } from "@mui/material";
+import { Button, LinearProgress } from "@mui/material";
 import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css"
 import { Link } from "react-router-dom";
@@ -30,20 +30,19 @@ export default function FilesPage(props){
         let docs = [];
         querySnapshot.forEach((doc)=> {
           let data = doc.data();
-          docs.push(<File id={doc.id} name={data.name} date={data.date}/>);
+          docs.push(<File id={doc.id} name={data.name} date={data.date} key={doc.id}/>);
         })
         setFiles(docs);
       }
-      getUserFiles();
-      
-    })
+      if(files.length==0) getUserFiles();
+    }, [])
     return (
         <>
           <Navbar admin={true}/>
           <div className={styles.body} style={{paddingTop:"10vh"}}>
             <h1>Your Files</h1>
             <div className={styles.popout} style={{textAlign:"left"}}>
-              {files.length>0?files:<CircularProgress />}
+              {files.length>0?files:<LinearProgress />}
               <br/>
               <Button variant={"contained"} sx={{display:"block", margin:"auto", width: "fit-content"}} component={Link} to={"/file/new"}>Create New File</Button>
               <br/>

@@ -18,11 +18,10 @@ function Navbar(props){
     let navigate = useNavigate();
     let iconStyles = {width:"65%", height:"auto", marginTop: "10px", marginBottom:"10px"};
     useEffect(()=> {
-        if(!auth.currentUser) navigate("/auth")
-    }, [auth.currentUser])
-    if(auth.currentUser == null){
-        navigate("/auth")
-    }
+        let goto = encodeURIComponent(window.location.pathname);
+        if(!auth.currentUser) navigate("/auth?rd="+ goto)
+    }, [])
+    
     return (
         <nav className={styles.container}>
             <img style={iconStyles} src="/wmaa.png"/>
@@ -51,7 +50,9 @@ function Navbar(props){
             {props.admin?
             <>
             <Tooltip title="Admin" placement="right">
-            <SecurityIcon sx={iconStyles} />
+                <IconButton component={Link} to={"/admin"}>
+                <SecurityIcon sx={iconStyles} />
+                </IconButton>
             </Tooltip>
             </>
             :null}
