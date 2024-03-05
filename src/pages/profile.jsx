@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css"
@@ -18,7 +18,17 @@ export default function ProfilePage(props){
     }
 
     let userInformation = auth.currentUser;
+    if(!auth.currentUser) {
+      navigate("/auth");
+      return (
+        <div style={{color:"black"}}>
+          <h1>Redirecting...</h1>
+          <p>Click <Link to={"/auth"}>here</Link> if the redirect isn't working...</p>
+        </div>
+      );
+    }
     console.log(userInformation);
+    
     return (
         <>
           <Navbar admin={true}/>
