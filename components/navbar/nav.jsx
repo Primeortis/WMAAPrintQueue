@@ -24,7 +24,7 @@ function Navbar(props){
     }, [])
     
     return (
-        <nav className={styles.container}>
+        <nav className={styles.container} style={{position:"fixed", top:"0em"}}>
             <img style={iconStyles} src="/wmaa.png"/>
             <Tooltip title="Profile" placement="right">
                 <IconButton component={Link} to={"/profile"}>

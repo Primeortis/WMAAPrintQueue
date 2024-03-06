@@ -65,7 +65,7 @@ export default function PrinterStatus(props){
         <>
             <Navbar admin={true}/>
             <div className={styles.body} style={{paddingTop:"10vh"}}>
-            <h1>Hey Bryson! Good to see you.</h1>
+            <h1>Printer Status</h1>
             <div className={styles.popout} style={{textAlign:"left"}}>
                 {printers}
             </div>
