@@ -5,7 +5,6 @@ import styles from "../pagestyles.module.css"
 import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth, signOut} from "firebase/auth"
 
-
 export default function ProfilePage(props){
     let navigate = useNavigate();
     const auth = getAuth(firebaseApp);
