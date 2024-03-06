@@ -43,9 +43,6 @@ export default function FileViewerPage(props){
             <h1>All Files</h1>
             <div className={styles.popout} style={{textAlign:"left"}}>
               {files.length>0?files:<LinearProgress />}
-              <br/>
-              <Button variant={"contained"} sx={{display:"block", margin:"auto", width: "fit-content"}} component={Link} to={"/file/new"}>Create New File</Button>
-              <br/>
             </div>
           </div>
         </>
