@@ -57,6 +57,7 @@ export default function ExistingFilePage(props){
       })
     }
 
+    let date = new Date(docData.date);
 
     return (
         <>
@@ -70,7 +71,7 @@ export default function ExistingFilePage(props){
                 <div className={styles.leftHalfScreen}>
                     <p>{docData.desc}</p>
                     <p>Class: Robotics, Automation, and Manufacturing</p>
-                    <p>{docData.date}</p>
+                    <p>{date.toLocaleDateString()} {date.toLocaleTimeString()}</p>
                     <div style={{display: "flex", flexDirection:"row", justifyContent:"space-evenly"}}>
                       <a href={stlURL} download={docData.name+".stl"}>
                       <IconButton>
