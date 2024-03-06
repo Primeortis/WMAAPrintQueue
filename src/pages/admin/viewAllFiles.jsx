@@ -35,7 +35,8 @@ export default function FileViewerPage(props){
           console.log(data)
           docs.push(<File id={doc.id} name={data.name} date={data.date} key={doc.id} username={data.userName}/>);
         })
-        setFiles(docs);
+
+        setFiles(docs.reverse());
       }
       if(files.length==0) getUserFiles();
     }, [])
