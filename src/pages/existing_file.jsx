@@ -29,7 +29,9 @@ export default function ExistingFilePage(props){
         let result = await getDoc(docReference);
         console.log(result)
         if(result.exists()){
-          setDocData(result.data());
+          let docdata = result.data();
+          let date = new Date(docdata.date);
+          setDocData({...docdata, date: date.toLocaleDateString() + " " + date.toLocaleTimeString()});
           console.log("document")
         }
 
@@ -57,8 +59,7 @@ export default function ExistingFilePage(props){
       })
     }
 
-    let date = new Date(docData.date);
-
+    
     return (
         <>
           <Navbar admin={true}/>
@@ -71,7 +72,7 @@ export default function ExistingFilePage(props){
                 <div className={styles.leftHalfScreen}>
                     <p>{docData.desc}</p>
                     <p>Class: Robotics, Automation, and Manufacturing</p>
-                    <p>{date.toLocaleDateString()} {date.toLocaleTimeString()}</p>
+                    <p>{docData.date}</p>
                     <div style={{display: "flex", flexDirection:"row", justifyContent:"space-evenly"}}>
                       <a href={stlURL} download={docData.name+".stl"}>
                       <IconButton>
