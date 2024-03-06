@@ -55,7 +55,7 @@ export default function PrinterStatus(props){
             let docs = [];
             querySnapshot.forEach((doc)=> {
                 let data = doc.data();
-                docs.push(<PrinterRow printer={doc.id} statusCode={data.status}/>)
+                docs.push(<PrinterRow printer={doc.id} statusCode={data.status} key={doc.id}/>)
             })
             setPrinters(docs);
         }
