@@ -8,14 +8,16 @@ import {getAuth} from "firebase/auth"
 import { getFirestore, collection, getDocs, where, query } from "firebase/firestore";
 
 function File(props){
-  return (
-    <Link className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} to={"/file/"+props.id}>
-        <p className={styles.emP}>{props.name}</p>
-        <p>
-            <i>{props.date}</i>
-        </p>
-    </Link>
-  )
+  let date = new Date(props.date);
+
+    return (
+      <Link className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} to={"/file/"+props.id}>
+          <p className={styles.emP}>{props.name}</p>
+          <p>
+              <i>{date.toLocaleDateString()} {date.toLocaleTimeString()}</i>
+          </p>
+      </Link>
+    )
 }
 
 export default function FilesPage(props){
@@ -32,7 +34,7 @@ export default function FilesPage(props){
           let data = doc.data();
           docs.push(<File id={doc.id} name={data.name} date={data.date} key={doc.id}/>);
         })
-        setFiles(docs);
+        setFiles(docs.reverse());
       }
       if(files.length==0) getUserFiles();
     }, [])
