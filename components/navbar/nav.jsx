@@ -14,11 +14,12 @@ import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
 
 function Navbar(props){
+    let goto = encodeURIComponent(window.location.pathname);
     let auth = getAuth(firebaseApp);
     let navigate = useNavigate();
     let iconStyles = {width:"65%", height:"auto", marginTop: "10px", marginBottom:"10px"};
     useEffect(()=> {
-        let goto = encodeURIComponent(window.location.pathname);
+        console.log(goto);
         if(!auth.currentUser) navigate("/auth?rd="+ goto)
     }, [])
     

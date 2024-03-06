@@ -1,7 +1,7 @@
 import { Button, IconButton, LinearProgress, Select, TextField } from "@mui/material";
 import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css"
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PrintIcon from '@mui/icons-material/Print';
@@ -9,19 +9,21 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from "react";
 import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
-import { getFirestore, getDoc, doc } from "firebase/firestore";
-import {getStorage, ref, getDownloadURL } from "firebase/storage"
+import { getFirestore, getDoc, doc, deleteDoc } from "firebase/firestore";
+import {getStorage, ref, getDownloadURL, deleteObject } from "firebase/storage"
 import { StlViewer } from "react-stl-viewer";
 
 export default function ExistingFilePage(props){
     const iconButtonStyles = {width:"1.7em", height:"auto"}
     const db = getFirestore(firebaseApp);
     const storage = getStorage(firebaseApp);
+    const navigate = useNavigate();
     let [docData, setDocData] = useState(null);
     let [stlURL, setSTLURL] = useState();
     useEffect(()=> {
       let pathsArr = window.location.pathname.split("/");
       var filename = pathsArr[pathsArr.length-1];
+      if(filename.length < 1){filename=pathsArr[pathsArr.length-2]} //if empty file path, check second...
       async function getDocument(){
         let docReference = doc(db, "files", filename);
         let result = await getDoc(docReference);
@@ -42,6 +44,20 @@ export default function ExistingFilePage(props){
       getDocument();
 
     }, [])
+
+    function deleteDocument(){
+      let pathsArr = window.location.pathname.split("/");
+      var filename = pathsArr[pathsArr.length-1];
+      if(filename.length < 1){filename=pathsArr[pathsArr.length-2]}
+      deleteObject(ref(storage, filename)).then(async ()=> {
+        await deleteDoc(doc(db, "files", filename));
+        navigate("/file");
+      }).catch((err)=> {
+        alert("something went wrong")
+      })
+    }
+
+
     return (
         <>
           <Navbar admin={true}/>
@@ -65,14 +81,19 @@ export default function ExistingFilePage(props){
                       <IconButton>
                         <PrintIcon sx={iconButtonStyles}/>
                       </IconButton>
-
-                      <IconButton>
+                      
+                      {
+                        docData.userID == getAuth(firebaseApp).currentUser.uid?
+                        <>
+                      <IconButton onClick={deleteDocument}>
                         <DeleteIcon sx={iconButtonStyles}/>
                       </IconButton>
-
+                      
                       <IconButton component={Link} to={"/file/"+(window.location.pathname.split("/").slice(-1))+"/edit"}>
                         <EditIcon sx={iconButtonStyles}/>
                       </IconButton>
+                      </>
+                      :null}
                     </div>
 
                 </div>
