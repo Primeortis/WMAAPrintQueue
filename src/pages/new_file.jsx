@@ -77,7 +77,8 @@ export default function NewFilePage(props){
           desc: desc,
           date: date.toISOString(),
           filename: filename,
-          userID: auth.currentUser.uid
+          userID: auth.currentUser.uid,
+          userName: auth.currentUser.displayName
         })
         setUploadStatus("Successfully Uploaded!")
         navigate("/file/"+filename);
