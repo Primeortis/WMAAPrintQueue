@@ -10,9 +10,11 @@ export default function AuthPage(props){
     let [error, setError] = useState(false);
     const auth = getAuth(firebaseApp);
     const provider = new GoogleAuthProvider();
+
+
     function onButtonClicked(){
         setPersistence(auth, browserLocalPersistence).then(()=> {
-            signInWithPopup(auth, provider).then((result)=> {
+            return signInWithPopup(auth, provider).then((result)=> {
                 let user = result.user;
                 let params = new URLSearchParams(window.location.search);
                 if(params.get("rd")&&params.get("rd")!="/auth"){navigate(params.get("rd"))}else{navigate("/")}
