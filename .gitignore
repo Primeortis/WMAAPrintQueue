@@ -4,3 +4,4 @@ bun.lockb
 src/firebase-config.js
 functions/wmaaprinting-firebase-adminsdk-g1pf0-25117f1c48.json
 firebase-debug.log
+ui-debug.log
