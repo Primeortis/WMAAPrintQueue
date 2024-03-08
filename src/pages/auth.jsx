@@ -19,8 +19,12 @@ export default function AuthPage(props){
                 let params = new URLSearchParams(window.location.search);
                 if(params.get("rd")&&params.get("rd")!="/auth"){navigate(params.get("rd"))}else{navigate("/")}
             }).catch((error)=> {
+                if(error.code == "auth/user-disabled"){
+                    navigate("/paused");
+                    return;
+                }
                 let errorMessage = error.message;
-                setError(errorMessage);
+                setError(errorMessage + error.code);
                 setTimeout(()=> {
                     setError(false);
                 },10000);
