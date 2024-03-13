@@ -30,7 +30,7 @@ export default function ProfilePage(props){
     
     return (
         <>
-          <Navbar admin={checkAdmin}/>
+          <Navbar admin={true}/>
           <div className={styles.body} style={{paddingTop:"10vh"}}>
             <h1>Hello {userInformation.displayName}!</h1>
             <div className={styles.popout} style={{textAlign:"left"}}>
