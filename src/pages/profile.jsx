@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import Navbar from "../../components/navbar/nav";
-import styles from "../pagestyles.module.css"
-import {firebaseApp} from "../../src/firebase-config.js"
-import {getAuth, signOut} from "firebase/auth"
+import styles from "../pagestyles.module.css";
+import {firebaseApp} from "../../src/firebase-config.js";
+import {getAuth, signOut} from "firebase/auth";
+//import {isAdmin} from "../../functions/CloudFunctions.jsx";
 
 export default function ProfilePage(props){
     let navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function ProfilePage(props){
     
     return (
         <>
-          <Navbar admin={checkAdmin}/>
+          <Navbar admin={true}/>
           <div className={styles.body} style={{paddingTop:"10vh"}}>
             <h1>Hello {userInformation.displayName}!</h1>
             <div className={styles.popout} style={{textAlign:"left"}}>
