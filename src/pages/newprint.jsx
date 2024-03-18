@@ -3,10 +3,11 @@ import { Box, Button, Modal, LinearProgress, TextField, Select, MenuItem } from 
 import styles from "../pagestyles.module.css"
 import File from "../../components/file.jsx";
 import { useEffect, useState } from "react";
-import { getFirestore, collection, query, where, getDocs, addDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, addDoc, doc, serverTimestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { firebaseApp } from "../firebase-config.js";
 import NorthEastIcon from '@mui/icons-material/NorthEast';
+import {Link} from "react-router-dom";
 
 const NewPrintPage = () => {
     let [files, setFiles] = useState(null);
@@ -72,7 +73,6 @@ const NewPrintPage = () => {
         material: printMaterial,
         location: printLocation,
         fileID: selectedFileID,
-        date: new Date().toISOString(),
         userID: auth.currentUser.uid,
         userDisplayName: auth.currentUser.displayName,
       }
@@ -98,7 +98,7 @@ const NewPrintPage = () => {
         try {
           const db = getFirestore(firebaseApp);
           const ref = doc(db, "categories", printLocation)
-          const docRef = await addDoc(collection(ref, 'prints'), printData);
+          const docRef = await addDoc(collection(ref, 'prints'), {...printData, timestamp: serverTimestamp()});
           console.log("Print data submitted successfully with ID: ", docRef.id);
           // Add any additional logic or UI updates after successful submission
         } catch (error) {
@@ -133,6 +133,7 @@ const NewPrintPage = () => {
                     <Box sx={{width: "80%", backgroundColor:"rgba(91,91,91,0.8)", margin:"auto", padding:"2px", marginTop:"5vh"}}>
                         <h1>Select Your File</h1>
                         {files?files:<LinearProgress />}
+                        <Button variant="contained" component={Link} to="/file/new">Add a new file</Button>
                     </Box>
                 </Modal>
               :null}
