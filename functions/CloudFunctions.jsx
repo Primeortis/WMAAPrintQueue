@@ -1,17 +1,19 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and triggers.
 const {logger} = require("firebase-functions");
-const {onRequest, HttpsError} = require("firebase-functions/v2/https");
+import * as functions from "firebase-functions/v2";
 
 import {setCustomUserClaims} from "firebase-tools"
 import {firebaseApp} from "../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
 
-exports.setLevel = onRequest(async (levelInput) => {
+//Sets the level of a user based on given UID and level from the user 
+const setlevel = functions.https.onRequest((request, response) => {
     const auth = getAuth(firebaseApp);
-    auth.setCustomUserClaims(auth.currentUser.uid, {level: levelInput});
+    auth.setCustomUserClaims(request[0], {level: request[1]});
+    logger.write("Updated " + auth.name())
 });
 
-exports.isAdmin = onRequest(async () => {
+const isadmin = onRequest(async () => {
     const auth = getAuth(firebaseApp);
     if(auth.currentUser.level == "admin"){
         return true;
@@ -19,17 +21,4 @@ exports.isAdmin = onRequest(async () => {
     return false;
 });
 
-/*function setLevel(levelInput){
-    const auth = getAuth(firebaseApp);
-    auth.setCustomUserClaims(auth.currentUser.uid, {level: levelInput});
-};
-
-function checkAdmin(){
-    const auth = getAuth(firebaseApp);
-    if(auth.currentUser.level == "admin"){
-        return true;
-    }
-    return false;
-};
-
-export {setLevel, checkAdmin};*/
+export {setlevel, isadmin}
