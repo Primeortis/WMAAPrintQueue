@@ -69,7 +69,7 @@ export default function QueueManagementPage(props){
             setCategories(docs);
         }
         getCategories();
-    })
+    }, [])
 
     function getQueueItems(){
         const db = getFirestore(firebaseApp);

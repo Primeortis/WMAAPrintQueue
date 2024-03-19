@@ -23,6 +23,7 @@ export default function AdminPage(props){
                     <Button variant="contained" component={Link} to="/admin/usermanagement" style={{margin:".5em"}}>Edit Users</Button>
                     <Button variant="contained" component={Link} to="/admin/queuemanagement" style={{margin:".5em"}}>Rearrange Queue</Button>
                     <Button variant="contained" component={Link} to="/admin/fileviewer" style={{margin:".5em"}}>View All Files</Button>
+                    <Button variant="contained" component={Link} to="/admin/printermanagement" style={{margin:".5em"}}>Manage Printers</Button>
                 </div>
             </div>
         </>

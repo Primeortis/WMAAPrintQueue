@@ -28,6 +28,7 @@ const NewPrintPage = () => {
       const db = getFirestore(firebaseApp);
       const q = query(collection(db, "categories"))
       async function getCategories(){
+        console.log("getting categories")
           var querySnapshot = await getDocs(q);
           console.log(querySnapshot);
           let docs = [];

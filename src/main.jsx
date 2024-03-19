@@ -17,7 +17,7 @@ import QueueManagementPage from './pages/admin/queueManagement.jsx'
 import FileViewerPage from './pages/admin/viewAllFiles.jsx'
 import PrintViewerPage from './pages/admin/viewAllPrints.jsx'
 import NewPrintPage from './pages/newprint.jsx'
-
+import PrinterManagementPage from './pages/admin/printerManagement.jsx'
 
 import {
   createBrowserRouter,
@@ -96,12 +96,12 @@ const router = createBrowserRouter([
     path:"/admin/fileviewer",
     element:<FileViewerPage/>,
     errorElement:<Error/>
-  }/*,
+  },
   {
-    path:"/admin/printviewer",
-    element:<PrintViewerPage>,
+    path:"/admin/printermanagement",
+    element:<PrinterManagementPage/>,
     errorElement:<Error/>
-  }//*/
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
