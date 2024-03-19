@@ -6,19 +6,8 @@ import { useEffect, useState } from "react";
 import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
 import { getFirestore, collection, getDocs, where, query } from "firebase/firestore";
+import File from "../../components/file";
 
-function File(props){
-  let date = new Date(props.date);
-
-    return (
-      <Link className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} to={"/file/"+props.id}>
-          <p className={styles.emP}>{props.name}</p>
-          <p>
-              <i>{date.toLocaleDateString()} {date.toLocaleTimeString()}</i>
-          </p>
-      </Link>
-    )
-}
 
 export default function FilesPage(props){
   let [files, setFiles] = useState([]);

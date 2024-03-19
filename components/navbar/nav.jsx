@@ -42,7 +42,9 @@ function Navbar(props){
                 </IconButton>
             </Tooltip>
             <Tooltip title="New Print" placement="right">
-            <LibraryAddIcon sx={iconStyles}/>    
+                <IconButton component={Link} to={"/print"}>
+                <LibraryAddIcon sx={iconStyles}/>
+                </IconButton>
             </Tooltip>
             <Tooltip title="Messages" placement="right">
             <NotificationsIcon sx={iconStyles}/>    

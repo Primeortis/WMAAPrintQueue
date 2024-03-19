@@ -16,6 +16,8 @@ import UserManagementPage from './pages/admin/userManagement.jsx'
 import QueueManagementPage from './pages/admin/queueManagement.jsx'
 import FileViewerPage from './pages/admin/viewAllFiles.jsx'
 import PrintViewerPage from './pages/admin/viewAllPrints.jsx'
+import NewPrintPage from './pages/newprint.jsx'
+
 
 import {
   createBrowserRouter,
@@ -68,6 +70,11 @@ const router = createBrowserRouter([
   {
     path:"/paused",
     element:<PausedPage/>,
+    errorElement:<Error/>
+  },
+  {
+    path:"/print",
+    element:<NewPrintPage/>,
     errorElement:<Error/>
   },
   {
