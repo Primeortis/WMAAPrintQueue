@@ -43,8 +43,18 @@ export default function UserManagementPage(props){
                 console.error(error);
             })
         }
-        
     }
+
+    function pauseUserButton(){
+        let pauseUser = httpsCallable(functions, "pauseuser");
+        pauseUser({uid: userInformation.uid, disabled:!userInformation.disabled}).then((result)=>{
+            console.log(result)
+            getUserInformation();
+        }).catch((error)=>{
+            console.error(error)
+        })
+    }
+
     return (
         <>
             <Navbar admin={true}/>
@@ -63,6 +73,8 @@ export default function UserManagementPage(props){
                         <p>Email: {userInformation.email}</p>
                         <p>Role: {userInformation.role}</p>
                         <p>Last Signed In At: {userInformation.lastSignIn}</p>
+                        <Button variant="contained">Edit User</Button>
+                        <Button variant="contained" onClick={pauseUserButton}>{userInformation.disabled?"Unpause User":"Pause User"}</Button>
                         </>
                     :<p>Enter a search query above...</p>}
                 </div>

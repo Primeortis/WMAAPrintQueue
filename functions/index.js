@@ -47,3 +47,11 @@ exports.getuserinformation = onCall(async (request) => {
     }
     return {result:moduser};
 })
+
+
+exports.pauseuser = onCall(async (request) => {
+    if(request.data.uid.length < 5) return {result:"Invalid UID"}
+    logger.log(request.data.disabled)
+    getAuth().updateUser(request.data.uid, {disabled: request.data.disabled});
+    return {result:"User paused state updated successfully!"}
+})
