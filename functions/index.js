@@ -13,6 +13,7 @@ const {onRequest, onCall, HttpsError} = require("firebase-functions/v2/https");
 const {initializeApp} = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 initializeApp();
+const auth = getAuth();
 
 exports.helloworld = onRequest(async (req, res)=> {
     res.send("Hello from Cloud Function!");
@@ -25,3 +26,24 @@ exports.setrole = onCall(async (request) => {
     return {result:"User role set successfully!"}
 });
 
+exports.getuserinformation = onCall(async (request) => {
+    logger.log(request.data)
+    if(!(request.data.email || request.data.uid)) return {result:"Invalid Request"};
+    let user;
+    if(request.data.uid){
+        user = await getAuth().getUser(request.data.uid);
+    } else {
+        user = await getAuth().getUserByEmail(request.data.email);
+    }
+    // remove unnecessary/possibly sensitive data
+    let moduser = {
+        role: user.customClaims.role,
+        disabled: user.disabled,
+        displayName: user.displayName,
+        email: user.email,
+        lastSignIn: user.metadata.lastSignInTime,
+        creationTime: user.metadata.creationTime,
+        uid: user.uid
+    }
+    return {result:moduser};
+})
