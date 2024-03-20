@@ -8,11 +8,20 @@
  */
 
 const {logger} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/v2/https");
+const {onRequest, onCall, HttpsError} = require("firebase-functions/v2/https");
 
 const {initializeApp} = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
 initializeApp();
 
-exports.addmessage = onRequest(async (req, res)=> {
+exports.helloworld = onRequest(async (req, res)=> {
     res.send("Hello from Cloud Function!");
 })
+exports.setrole = onCall(async (request) => {
+    if(request.data.uid.length < 5) return {result:"Invalid UID"}
+    logger.log("Role route start");
+    logger.log("Role route", request.data.uid, request.data.role);
+    getAuth().setCustomUserClaims(request.data.uid, {role: request.data.role});
+    return {result:"User role set successfully!"}
+});
+

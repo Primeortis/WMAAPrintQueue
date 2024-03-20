@@ -15,7 +15,7 @@ export default function AuthPage(props){
     function onButtonClicked(){
         setPersistence(auth, browserLocalPersistence).then(()=> {
             return signInWithPopup(auth, provider).then((result)=> {
-                let user = result.user;
+                let user = result.user; // TODO: add error handling for those not in WMAA email
                 let params = new URLSearchParams(window.location.search);
                 if(params.get("rd")&&params.get("rd")!="/auth"){navigate(params.get("rd"))}else{navigate("/")}
             }).catch((error)=> {

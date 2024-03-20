@@ -12,15 +12,22 @@ import { Link, useNavigate } from "react-router-dom";
 
 import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
+import { useState } from "react";
 
 function Navbar(props){
+    let [isAdmin, setIsAdmin] = useState(false);
     let goto = encodeURIComponent(window.location.pathname);
     let auth = getAuth(firebaseApp);
     let navigate = useNavigate();
     let iconStyles = {width:"65%", height:"auto", marginTop: "10px", marginBottom:"10px"};
     useEffect(()=> {
         console.log(goto);
-        if(!auth.currentUser) navigate("/auth?rd="+ goto)
+        if(!auth.currentUser) navigate("/auth?rd="+ goto);
+        auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+            if(idTokenResult.claims.role == "admin") setIsAdmin(true);
+          }).catch((err)=> {
+            console.error(err)
+          })
     }, [])
     
     return (
@@ -50,7 +57,7 @@ function Navbar(props){
             <NotificationsIcon sx={iconStyles}/>    
             </Tooltip>
             
-            {props.admin?
+            {isAdmin?
             <>
             <Tooltip title="Admin" placement="right">
                 <IconButton component={Link} to={"/admin"}>
