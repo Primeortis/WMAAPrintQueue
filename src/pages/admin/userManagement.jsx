@@ -6,11 +6,14 @@ import {getAuth} from "firebase/auth"
 import { useNavigate } from "react-router-dom";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { useState } from "react";
+import ConfirmModal from "../../../components/confirmModal.jsx";
 
 export default function UserManagementPage(props){
     let [userInformation, setUserInformation] = useState({});
     let [userIDOrEmail, setUserIDOrEmail] = useState("");
     let [loadingInformation, setLoadingInformation] = useState(false);
+    let [modalOpen, setModalOpen] = useState(false);
+    let [modalMessage, setModalMessage] = useState("");
     let navigate = useNavigate();
     const auth = getAuth(firebaseApp);
     const functions = getFunctions(firebaseApp);
@@ -46,10 +49,15 @@ export default function UserManagementPage(props){
     }
 
     function pauseUserButton(){
+        setModalMessage("Are you sure you want to " + (userInformation.disabled?"unpause the user?":"pause the user?"))
+        setModalOpen(true)
+    }
+
+    function pauseUser(){
         let pauseUser = httpsCallable(functions, "pauseuser");
         pauseUser({uid: userInformation.uid, disabled:!userInformation.disabled}).then((result)=>{
             console.log(result)
-            getUserInformation();
+            setTimeout(()=>getUserInformation(), 500);
         }).catch((error)=>{
             console.error(error)
         })
@@ -75,6 +83,7 @@ export default function UserManagementPage(props){
                         <p>Last Signed In At: {userInformation.lastSignIn}</p>
                         <Button variant="contained">Edit User</Button>
                         <Button variant="contained" onClick={pauseUserButton}>{userInformation.disabled?"Unpause User":"Pause User"}</Button>
+                        {modalOpen?<ConfirmModal message={modalMessage} onConfirm={pauseUser} onCancel={()=>{setModalOpen(false)}}/>:null}
                         </>
                     :<p>Enter a search query above...</p>}
                 </div>
