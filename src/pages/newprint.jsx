@@ -76,6 +76,7 @@ const NewPrintPage = () => {
         fileID: selectedFileID,
         userID: auth.currentUser.uid,
         userDisplayName: auth.currentUser.displayName,
+        email: auth.currentUser.email
       }
       if (
         printName &&
