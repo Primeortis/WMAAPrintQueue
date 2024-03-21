@@ -17,7 +17,7 @@ import { useState } from "react";
 function Navbar(props){
     let [isAdmin, setIsAdmin] = useState(false);
     let goto = encodeURIComponent(window.location.pathname);
-    let auth = getAuth(firebaseApp);
+    const auth = getAuth(firebaseApp);
     let navigate = useNavigate();
     let iconStyles = {width:"65%", height:"auto", marginTop: "10px", marginBottom:"10px"};
     useEffect(()=> {

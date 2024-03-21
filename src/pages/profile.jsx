@@ -28,6 +28,7 @@ export default function ProfilePage(props){
     }
 
     useEffect(()=> {
+      if(!auth.currentUser) navigate("/auth");
       auth.currentUser.getIdTokenResult().then((idTokenResult) => {
         setUserRole(idTokenResult.claims.role);
       }).catch((err)=> {
