@@ -8,6 +8,7 @@
  */
 
 const {logger} = require("firebase-functions");
+const functions = require("firebase-functions/v1");
 const {onRequest, onCall, HttpsError} = require("firebase-functions/v2/https");
 
 const {initializeApp} = require("firebase-admin/app");
@@ -18,6 +19,7 @@ const auth = getAuth();
 exports.helloworld = onRequest(async (req, res)=> {
     res.send("Hello from Cloud Function!");
 })
+
 exports.setrole = onCall(async (request) => {
     if(request.data.uid.length < 5) return {result:"Invalid UID"}
     logger.log("Role route start");
@@ -48,6 +50,11 @@ exports.getuserinformation = onCall(async (request) => {
     return {result:moduser};
 })
 
+exports.handlenewuser = functions.auth.user().onCreate((user) => {
+    logger.log("New User Created: " + user.displayName);
+    //getAuth().setCustomUserClaims(user.uid, {role: "pending"});
+    return {result:"New User Created: " + user.displayName};
+});
 
 exports.pauseuser = onCall(async (request) => {
     if(request.data.uid.length < 5) return {result:"Invalid UID"}
