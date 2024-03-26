@@ -23,6 +23,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import ClassroomPage from './pages/classroom.jsx'
 
 
 
@@ -76,6 +77,11 @@ const router = createBrowserRouter([
     path:"/print",
     element:<NewPrintPage/>,
     errorElement:<Error/>
+  },
+  {
+    path: "/classroom",
+    element: <ClassroomPage/>, 
+    errorElement: <Error/>
   },
   {
     path:"/admin",
