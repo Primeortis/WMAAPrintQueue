@@ -4,7 +4,6 @@ import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css";
 import {firebaseApp} from "../../src/firebase-config.js";
 import {getAuth, signOut} from "firebase/auth";
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { useEffect, useState } from "react";
 
 export default function ProfilePage(props){
@@ -12,11 +11,6 @@ export default function ProfilePage(props){
 
     let navigate = useNavigate();
     const auth = getAuth(firebaseApp);
-    const functions = getFunctions(firebaseApp);
-
-    // REMOVE BELOW IN PRODUCTION
-    connectFunctionsEmulator(functions, "localhost", 5001); 
-    // --------
 
 
     function signOutButton(){
@@ -48,17 +42,7 @@ export default function ProfilePage(props){
     }
     console.log(userInformation);
     
-    function tryFunction(){
-      const setRole = httpsCallable(functions, "setrole");
-      setRole({uid: "", role: "admin"}).then((result) => {
-        console.log(result);
-      }).catch((error) => {
-        console.error(error);
-      })
-    }
-
     
-
     return (
         <>
           <Navbar admin={true}/>
@@ -69,7 +53,6 @@ export default function ProfilePage(props){
               <p>User ID: {userInformation.uid} (Click to Copy)</p>
               <p>Status: {userRole}</p>
               <Button variant="contained" onClick={signOutButton}>Sign Out</Button>
-              <Button variant="contained" onClick={tryFunction}>Set User Role</Button>
             </div>
           </div>
         </>
