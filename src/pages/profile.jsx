@@ -5,13 +5,18 @@ import styles from "../pagestyles.module.css";
 import {firebaseApp} from "../../src/firebase-config.js";
 import {getAuth, signOut} from "firebase/auth";
 import { useEffect, useState } from "react";
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 export default function ProfilePage(props){
     let [userRole, setUserRole] = useState("")
 
     let navigate = useNavigate();
     const auth = getAuth(firebaseApp);
+    const functions = getFunctions(firebaseApp);
 
+    // REMOVE BELOW IN PRODUCTION
+    connectFunctionsEmulator(functions, "localhost", 5001);
+    // --------
 
     function signOutButton(){
         signOut(auth).then(()=> {
@@ -42,7 +47,11 @@ export default function ProfilePage(props){
     }
     console.log(userInformation);
     
-    
+    if(!userInformation.role){
+        let setRole = httpsCallable(functions, "setrole");
+        setRole(userInformation.uid, "pending");
+    }
+
     return (
         <>
           <Navbar admin={true}/>

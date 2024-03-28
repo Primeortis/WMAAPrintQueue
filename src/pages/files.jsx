@@ -7,9 +7,10 @@ import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
 import { getFirestore, collection, getDocs, where, query } from "firebase/firestore";
 import File from "../../components/file";
-
+import { useNavigate } from "react-router-dom"
 
 export default function FilesPage(props){
+  let navigate = useNavigate();
   let [files, setFiles] = useState([]);
     useEffect(()=> {
       const db = getFirestore(firebaseApp);
@@ -19,6 +20,7 @@ export default function FilesPage(props){
         var querySnapshot = await getDocs(q);
         console.log(querySnapshot);
         let docs = [];
+        if(querySnapshot.docs.length == 0){navigate("/file/new");}
         querySnapshot.forEach((doc)=> {
           let data = doc.data();
           docs.push(<File id={doc.id} name={data.name} date={data.date} key={doc.id}/>);

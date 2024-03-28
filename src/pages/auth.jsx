@@ -4,13 +4,18 @@ import { useState } from "react";
 import Parent from "../../components/basic/parent";
 import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence} from "firebase/auth"
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 export default function AuthPage(props){
     const navigate = useNavigate();
     let [error, setError] = useState(false);
     const auth = getAuth(firebaseApp);
     const provider = new GoogleAuthProvider();
+    const functions = getFunctions(firebaseApp);
 
+    // REMOVE BELOW IN PRODUCTION
+    connectFunctionsEmulator(functions, "localhost", 5001);
+    // --------
 
     function onButtonClicked(){
         setPersistence(auth, browserLocalPersistence).then(()=> {

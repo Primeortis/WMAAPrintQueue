@@ -52,7 +52,7 @@ exports.getuserinformation = onCall(async (request) => {
 
 exports.handlenewuser = functions.auth.user().onCreate((user) => {
     logger.log("New User Created: " + user.displayName);
-    //getAuth().setCustomUserClaims(user.uid, {role: "pending"});
+    getAuth().setCustomUserClaims(user.uid, {role: "pending"});
     return {result:"New User Created: " + user.displayName};
 });
 

@@ -3,26 +3,16 @@ import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css"
 import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth, signOut} from "firebase/auth"
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 export default function AdminPage(props){
-    let navigate = useNavigate();
     const functions = getFunctions(firebaseApp);
     const auth = getAuth(firebaseApp);
 
     // REMOVE BELOW IN PRODUCTION
     connectFunctionsEmulator(functions, "localhost", 5001);
-    connectAuthenticationEmulator(auth, "localhost", 9099);
     // --------
-    
-    let getUser = httpsCallable(functions, "getuserinformation");
-
-    let userInformation = getUser(auth.currentUser.uid);
-
-    if(userInformation.role != "admin"){
-        useNavigate("/profile");
-    }
 
     return (
         <>
