@@ -9,8 +9,8 @@ const ConfirmModal = ({ message, onConfirm, onCancel }) => {
                 <p>{message}</p>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onConfirm}>Confirm</Button>
                 <Button onClick={onCancel}>Cancel</Button>
+                <Button onClick={onConfirm}>Confirm</Button>
             </DialogActions>
         </Dialog>
     );
