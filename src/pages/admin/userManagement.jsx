@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { useState } from "react";
 import ConfirmModal from "../../../components/confirmModal.jsx";
+import Alert from '@mui/material/Alert';
+
 
 export default function UserManagementPage(props){
     const auth = getAuth(firebaseApp);
@@ -18,6 +20,7 @@ export default function UserManagementPage(props){
     let [modal2Open, setModal2Open] = useState(false);
     let [modal2Message, setModal2Message] = useState("");
     let [userLevel, setUserLevel] = useState(null);
+    let [error, setError] = useState(null);
     let navigate = useNavigate();
 
     // REMOVE BELOW IN PRODUCTION
@@ -32,8 +35,14 @@ export default function UserManagementPage(props){
         if(emailRegex.test(userIDOrEmail)){
             let getUser = httpsCallable(functions, "getuserinformation");
             getUser({email: userIDOrEmail}).then((result)=>{
-                setUserInformation(result.data.result);
-                console.log(result.data.result)
+                if(result.data.result.error){
+                    setError(result.data.result.message);
+                    console.log(result.data.result.message)
+                } else {
+                    setError(null)
+                    setUserInformation(result.data.result);
+                    console.log(result.data.result)
+                }
                 setLoadingInformation(false)
             }).catch((error)=>{
                 console.error(error);
@@ -91,6 +100,7 @@ export default function UserManagementPage(props){
                     <TextField label="User UID or Email" variant="outlined" fullWidth value={userIDOrEmail} onChange={(e)=>setUserIDOrEmail(e.target.value)}/>
                     <Button variant="contained" onClick={getUserInformation}>Get User Information</Button>
                     {loadingInformation?<LinearProgress/>:null}
+                    {error!=null?<Alert severity="error">{error}</Alert>:null}
                     <br/>
                     {userInformation.displayName?
                         <>
