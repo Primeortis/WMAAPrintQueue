@@ -13,13 +13,12 @@ const {onRequest, onCall, HttpsError} = require("firebase-functions/v2/https");
 
 const {initializeApp} = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
-const { getFirestore } = require("firebase/firestore");
-initializeApp();
+const { getFirestore } = require("firebase-admin/firestore");
+const app = initializeApp();
 
 
-async function deleteCollection(collectionPath, batchSize) {
-    const db = getFirestore();
-    const collectionRef = db.collection(collectionPath);
+
+async function deleteCollection(db, collectionRef, batchSize) {
     const query = collectionRef.orderBy('__name__').limit(batchSize);
   
     return new Promise((resolve, reject) => {
@@ -113,6 +112,19 @@ exports.pauseuser = onCall(async (request) => {
     return {result:"User paused state updated successfully!"}
 })
 
-// exports.deleteCategory = onCall(async (request)=> {
-    
-// })
+exports.deleteCategory = onCall(async (request)=> {
+    // CHECK IF USER IS ADMIN
+    if(request.auth.token.role != "admin") return {error:true, message:"Unauthorized"}
+    // ---
+
+    const db = getFirestore();
+    try {
+        const collectionRef = db.collection("categories").doc(request.data.id).collection("prints");
+        await deleteCollection(db, collectionRef, 100);
+        await db.collection("categories").doc(request.data.id).delete();
+    } catch(e){
+        return {error:true, message:e}
+    } finally {
+        return {result:"Category deleted successfully!", error:false}
+    }
+})

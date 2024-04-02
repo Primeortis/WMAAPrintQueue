@@ -7,11 +7,14 @@ import { useNavigate } from "react-router-dom";
 import {getFirestore, doc, getDocs, collection, setDoc} from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { Delete } from "@mui/icons-material";
+import { httpsCallable, getFunctions } from "firebase/functions";
+import ConfirmModal from "../../../components/confirmModal.jsx";
 
 
 export default function PrinterManagementPage(props){
     let navigate = useNavigate();
     const auth = getAuth(firebaseApp);
+    const functions = getFunctions(firebaseApp);
     let [categories, setCategories] = useState(null);
     let [printers, setPrinters] = useState(null);
     let [modalOpen, setModalOpen] = useState(false);
@@ -23,6 +26,7 @@ export default function PrinterManagementPage(props){
     let [newPrinterName, setNewPrinterName] = useState("");
     let [newPrinterCategory, setNewPrinterCategory] = useState("");
     let [newPrinterMaterial, setNewPrinterMaterial] = useState("");
+    let [deleteModal, setDeleteModal] = useState(null);
     let userInformation = auth.currentUser;
     
     useEffect(()=> {
@@ -88,17 +92,37 @@ export default function PrinterManagementPage(props){
         setPrinterModalOpen(false);
     }
 
+    function checkBeforeDeletingCategory(id){
+        setDeleteModal(<ConfirmModal onConfirm={()=>deleteCategory(id)} onCancel={()=>setDeleteModal(null)} message={"Are you sure you want to delete this collection? You should delete or change the category of all printers associated with this category. All queuing information within this category will be deleted. Are you sure?"}/>)
+    }
+
+    function deleteCategory(id){
+        let deleteCategory = httpsCallable(functions, "deleteCategory");
+        deleteCategory({id: id}).then((result)=>{
+            if(result.data.error){
+                console.error(result.data.message)
+            } else {
+                setCategories(categories.filter((category)=>category.id!=id))
+            }
+            setDeleteModal(null)
+        }).catch((error)=>{
+            console.error(error);
+        })
+        
+    }
+
     return (
         <>
             <Navbar admin={true}/>
             <div className={styles.body} style={{paddingTop:"5vh"}}>
                 <h1>Manage Printers</h1>
                 <div className={styles.popout}>
+                    {deleteModal}
                     <h2>Printer Collections</h2>
                     {
                         categories ? categories.map((category) => {
                             return (
-                                <><p><IconButton><Delete/></IconButton>{category.id}</p></>
+                                <><p><IconButton onClick={()=>checkBeforeDeletingCategory(category.id)}><Delete/></IconButton>{category.id}</p></>
                             )
                         }):<LinearProgress/>
                     }
