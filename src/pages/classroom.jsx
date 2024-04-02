@@ -83,21 +83,65 @@ function StatusIcon(props){
 
 
 function PrinterRow(props){
-    let msg = "";
-    if(props.statusCode == "printing"){
-        msg = "Currently Printing"
-    } else if(props.statusCode == "wait"){
-        msg = "Awaiting Print Removal Confirmation"
-    } else if(props.statusCode == "good"){
-        msg = "Ready to Print"
-    } else if(props.statusCode == "no service"){
-        msg = "Out of Service"
+    let [msg, setMsg] = useState("")
+    let [statusCode, setStatusCode] = useState(props.statusCode)
+
+    function getTimeDifference(futureTimestamp) {
+        const currentTime = new Date();
+        const futureTime = new Date(futureTimestamp);
+    
+        const differenceInMilliseconds = futureTime - currentTime;
+        if (differenceInMilliseconds < 0) {
+            return "The future timestamp is in the past";
+        }
+    
+        const differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
+        const differenceInMinutes = Math.floor(differenceInSeconds / 60);
+        const differenceInHours = Math.floor(differenceInMinutes / 60);
+        //const differenceInDays = Math.floor(differenceInHours / 24); // Shouldn't be used? evaluate parameters of project... probably just use 24+ hours
+    
+        return `${differenceInHours % 24} hours, ${differenceInMinutes % 60} minutes, and ${differenceInSeconds % 60} seconds remaining`;
     }
+
+    setInterval(()=> {
+        if(statusCode == "printing"){
+            let timeString = getTimeDifference(props.timeToDone);
+            if(timeString == "The future timestamp is in the past"){
+                setStatusCode("wait");
+                return;
+            } else {
+                setMsg("Currently Printing\n"+timeString);
+            }
+        }
+    
+    }, 1000)
+
+    
+    useEffect(()=> {
+        if(props.statusCode == "printing"){
+            let timeString = getTimeDifference(props.timeToDone);
+            if(timeString == "The future timestamp is in the past"){
+                statusCode = "wait";
+            } else {
+                statusCode = "printing";
+                setMsg("Currently Printing\n"+timeString);
+            }
+        }
+        if(statusCode == "wait"){
+            setMsg("Awaiting Print Removal Confirmation")
+        } else if(statusCode == "good"){
+            setMsg("Ready to Print");
+        } else if(statusCode == "no service"){
+            setMsg("Out of Service")
+        }
+    }, [msg, statusCode])
+        
+    
     return (
         <div className={styles.rows}>
             <p className={styles.emP}>{props.printer}</p>
             <p onClick={() => props.onStatusUpdate({statusCode: props.statusCode, name: props.printer})} style={{cursor: "pointer"}}>
-                <StatusIcon status={props.statusCode}/>
+                <StatusIcon status={statusCode}/>
                 <i>{msg}</i>
             </p>
             <IconButton onClick={()=> {props.onButtonClick(props.printer)}}>
@@ -136,7 +180,7 @@ const ClassroomPage = () => {
         let docs = [];
         querySnapshot.forEach((doc)=> {
             let data = doc.data();
-            docs.push(<PrinterRow printer={doc.id} statusCode={data.status} key={doc.id} onStatusUpdate={(state)=>{setPrinterBeingEdited(state.name);setNewPrinterState(state.statusCode);setNewPrinterStateModalOpen(true);}} onButtonClick={getMaintenanceLogs}/>)
+            docs.push(<PrinterRow printer={doc.id} statusCode={data.status} timeToDone={data.timeToDone} key={doc.id} onStatusUpdate={(state)=>{setPrinterBeingEdited(state.name);setNewPrinterState(state.statusCode);setNewPrinterStateModalOpen(true);}} onButtonClick={getMaintenanceLogs}/>)
         })
         setPrinters(docs);
     }
@@ -273,8 +317,9 @@ const ClassroomPage = () => {
             }
         }
         updateState();
+        getPrinterStatuses()
         setNewPrinterStateModalOpen(false);
-        getPrinterStatuses();
+        
     }
 
     return (
