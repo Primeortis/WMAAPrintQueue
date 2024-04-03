@@ -1,4 +1,4 @@
-import { Button, Select, TextField } from "@mui/material";
+import { Alert, Button, Select, TextField } from "@mui/material";
 import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css"
 import { Link } from "react-router-dom";
@@ -16,9 +16,9 @@ export default function NewFilePage(props){
     var [isEditingFile, setEditingFile] = useState("new");
     var [documentStlUrl, setDocStlUrl] = useState(null);
     var [files, setFiles] = useState(null);
-    let [uploadStatus, setUploadStatus] = useState("");
     let [name, setDocName] = useState("");
     let [desc, setDocDesc] = useState("");
+    let [info, setInfo] = useState(null);
     
     const storage = getStorage(firebaseApp);
     const auth = getAuth(firebaseApp);
@@ -54,24 +54,64 @@ export default function NewFilePage(props){
     }
 
     async function updateFile(){
+      setInfo(null);
       let urlpaths = window.location.pathname.split("/");
-
+      if(!files){
+        setInfo(<Alert severity="error">Please select a file to upload</Alert>)
+        return;
+      }
+      if(name.length < 5){
+        setInfo(<Alert severity="error">Please add a longer file name</Alert>)
+        return;
+      }
+      if(desc.length < 5){
+        setInfo(<Alert severity="error">Please add a longer file description</Alert>)
+        return;
+      }
+      if(files.size > 10 * 1024 * 1024){
+        setInfo(<Alert severity="error">Your file is too large. Please pick a file under 10mb</Alert>)
+        return;
+      }
+      if(files.name.slice(-4) !== ".stl"){
+        setInfo(<Alert severity="error">Invalid File Type. Only STL files are accepted.</Alert>)
+        return;
+      }
       await updateDoc(doc(db, "files", urlpaths[urlpaths.length-2]), {
         name: name,
         desc: desc,
       })
-      setUploadStatus("Successfully Edited...redirecting");
+      setInfo(<Alert severity="success">File Updated Successfully!</Alert>)
       navigate("/file/"+urlpaths[urlpaths.length-2])
     }
 
     function uploadFile(){
+      if(!files){
+        setInfo(<Alert severity="error">Please select a file to upload</Alert>)
+        return;
+      }
+      if(name.length < 5){
+        setInfo(<Alert severity="error">Please add a longer file name</Alert>)
+        return;
+      }
+      if(desc.length < 5){
+        setInfo(<Alert severity="error">Please add a longer file description</Alert>)
+        return;
+      }
+      if(files.size > 10 * 1024 * 1024){
+        setInfo(<Alert severity="error">Your file is too large. Please pick a file under 10mb</Alert>)
+        return;
+      }
+      if(files.name.slice(-4) !== ".stl"){
+        setInfo(<Alert severity="error">Invalid File Type. Only STL files are accepted.</Alert>)
+        return;
+      }
       let date = new Date();
       let filename = date.toISOString() + "!!" + auth.currentUser.uid + ".stl";
-      setUploadStatus("Starting File Upload...")
+      setInfo(<Alert severity="info">Uploading File...</Alert>)
       uploadBytes(ref(storage, filename), files).then(async (snapshot)=> {
         console.log("complete");
         console.log(snapshot)
-        setUploadStatus("File Upload Complete...Adding Metadata")
+        setInfo(<Alert severity="success">File Upload Complete! Placing finishing touches...</Alert>)
         await setDoc(doc(db, "files", filename), {
           name: name,
           desc: desc,
@@ -80,12 +120,23 @@ export default function NewFilePage(props){
           userID: auth.currentUser.uid,
           userName: auth.currentUser.displayName
         })
-        setUploadStatus("Successfully Uploaded!")
+        setInfo(<Alert severity="success">File Upload Complete!</Alert>)
         navigate("/file/"+filename);
       })
     }
 
     function handleChange(event){
+      if(event.target.files.length > 1) return;
+      if (event.target.files[0].size > 10 * 1024 * 1024) { // check 10 megabytes
+        alert("File size exceeds the limit of 10 megabytes.");
+        setFiles("")
+        return;
+      }
+      if (event.target.files[0].name.slice(-4) !== ".stl") { // Updated file type check to accept ".stl" files
+        alert("Only STL files are accepted.");
+        setFiles("");
+        return;
+      }
       setFiles(event.target.files[0]);
       console.log(event.target.files[0]);
     }
@@ -108,7 +159,7 @@ export default function NewFilePage(props){
                 <div className={styles.rightHalfScreen}>
                     {!documentStlUrl?
                     <div style={{backgroundColor:"#DADADA", cursor:"pointer", height:"60%"}}>
-                        <p onClick={uploadFile}>Click to select your file, or drag it into this rectangle</p>
+                        <p onClick={uploadFile}>Click to select your file. Only STL files are accepted up to 10 megabytes</p>
                         <input type="file" onChange={handleChange} accept=".stl"></input>
                     </div>
                     :
@@ -120,7 +171,7 @@ export default function NewFilePage(props){
                 </div>
                 <Button variant="contained" component={Link} to={"/file"} sx={{marginRight:"10px"}}>Back</Button>
                 <Button variant="contained" onClick={uploadFileButton}>{isEditingFile=="new"? "Upload": "Update"}</Button>
-                <p>{uploadStatus}</p>
+                {info}
             </div>
           </div>
         </>

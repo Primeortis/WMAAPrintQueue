@@ -12,6 +12,7 @@ import {getAuth} from "firebase/auth"
 import { getFirestore, getDoc, doc, deleteDoc } from "firebase/firestore";
 import {getStorage, ref, getDownloadURL, deleteObject } from "firebase/storage"
 import { StlViewer } from "react-stl-viewer";
+import ConfirmModal from "../../components/confirmModal.jsx";
 
 export default function ExistingFilePage(props){
     const iconButtonStyles = {width:"1.7em", height:"auto"}
@@ -20,6 +21,7 @@ export default function ExistingFilePage(props){
     const navigate = useNavigate();
     let [docData, setDocData] = useState(null);
     let [stlURL, setSTLURL] = useState();
+    let [confirmModal, setConfirmModal] = useState(null);
     useEffect(()=> {
       let pathsArr = window.location.pathname.split("/");
       var filename = pathsArr[pathsArr.length-1];
@@ -47,6 +49,20 @@ export default function ExistingFilePage(props){
 
     }, [])
 
+    function deleteDocumentButton(){
+      setConfirmModal(
+        <ConfirmModal
+          message="Are you sure you want to delete this file? This action is irreversible."
+          onConfirm={()=> {
+            deleteDocument();
+          }}
+          onClose={()=> {
+            setConfirmModal(null);
+          }}
+        />
+      )
+    }
+
     function deleteDocument(){
       let pathsArr = window.location.pathname.split("/");
       var filename = pathsArr[pathsArr.length-1];
@@ -63,6 +79,7 @@ export default function ExistingFilePage(props){
     return (
         <>
           <Navbar admin={true}/>
+          {confirmModal}
           <div className={styles.body} style={{paddingTop:"10vh"}}>
             {docData?<>
             <h1>{docData.name}</h1>
@@ -87,7 +104,7 @@ export default function ExistingFilePage(props){
                       {
                         docData.userID == getAuth(firebaseApp).currentUser.uid?
                         <>
-                      <IconButton onClick={deleteDocument}>
+                      <IconButton onClick={deleteDocumentButton}>
                         <DeleteIcon sx={iconButtonStyles}/>
                       </IconButton>
                       
