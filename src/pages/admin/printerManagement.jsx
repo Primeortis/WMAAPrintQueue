@@ -8,7 +8,7 @@ import {getFirestore, doc, getDocs, collection, setDoc} from "firebase/firestore
 import { useState, useEffect } from "react";
 import { Delete } from "@mui/icons-material";
 import { httpsCallable, getFunctions } from "firebase/functions";
-import ConfirmModal from "../../../components/confirmModal.jsx";
+import ConfirmModal, {ExtraConfirmModal} from "../../../components/confirmModal.jsx";
 
 
 export default function PrinterManagementPage(props){
@@ -93,7 +93,7 @@ export default function PrinterManagementPage(props){
     }
 
     function checkBeforeDeletingCategory(id){
-        setDeleteModal(<ConfirmModal onConfirm={()=>deleteCategory(id)} onCancel={()=>setDeleteModal(null)} message={"Are you sure you want to delete this collection? You should delete or change the category of all printers associated with this category. All queuing information within this category will be deleted. Are you sure?"}/>)
+        setDeleteModal(<ExtraConfirmModal confirmPhrase={id} onConfirm={()=>deleteCategory(id)} onCancel={()=>setDeleteModal(null)} message={"Are you sure you want to delete this collection? You should delete or change the category of all printers associated with this category. All queuing information within this category will be deleted. Are you sure?"}/>)
     }
 
     function deleteCategory(id){
