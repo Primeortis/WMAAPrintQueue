@@ -75,7 +75,15 @@ export default function ExistingFilePage(props){
       })
     }
 
-    
+    function printDocument(){
+      let pathsArr = window.location.pathname.split("/");
+      var filename = pathsArr[pathsArr.length-1];
+      if(filename.length < 1){filename=pathsArr[pathsArr.length-2]}
+      console.log(filename);
+      let docReference = doc(db, "files", filename);
+      navigate("/print?file=" + docReference.id);
+    }
+
     return (
         <>
           <Navbar admin={true}/>
@@ -97,7 +105,7 @@ export default function ExistingFilePage(props){
                       </IconButton>
                       </a>
 
-                      <IconButton>
+                      <IconButton onClick={printDocument}>
                         <PrintIcon sx={iconButtonStyles}/>
                       </IconButton>
                       

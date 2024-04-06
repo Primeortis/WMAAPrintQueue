@@ -39,6 +39,19 @@ const NewPrintPage = () => {
           setCategories(docs);
       }
       getCategories();
+      async function checkFileParams(){
+        let params = new URLSearchParams(window.location.search);
+        if(params.get("file")){
+          let fileID = params.get("file");
+          console.log("Caught File: " + fileID);
+          setSelectedFileID(fileID);
+          console.log("selectedFileID: " + selectedFileID);
+          const db = getFirestore(firebaseApp);
+          let docReference = doc(db, "files", selectedFileID);
+          setSelectedFile(docReference.name);
+          console.log("selectedFile: " + selectedFile + "\n selectedFileID: " + selectedFileID);
+        }//*/
+      }checkFileParams();
     }, [])
 
     function onOpenButtonClicked(){
@@ -111,6 +124,7 @@ const NewPrintPage = () => {
       }
 
     }
+
 
     return (
         <>
