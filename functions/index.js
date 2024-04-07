@@ -128,3 +128,20 @@ exports.deleteCategory = onCall(async (request)=> {
         return {result:"Category deleted successfully!", error:false}
     }
 })
+
+exports.deletePrinter = onCall(async (request)=> {
+    // CHECK IF USER IS ADMIN
+    if(request.auth.token.role != "admin") return {error:true, message:"Unauthorized"}
+    // ---
+
+    const db = getFirestore();
+    try {
+        const collectionRef = db.collection("printers").doc(request.data.id).collection("maintenance");
+        await deleteCollection(db, collectionRef, 100);
+        await db.collection("printers").doc(request.data.id).delete();
+    } catch(e){
+        return {error:true, message:e}
+    } finally {
+        return {result:"Printer deleted successfully!", error:false}
+    }
+})

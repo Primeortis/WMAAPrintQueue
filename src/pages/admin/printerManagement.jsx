@@ -108,8 +108,27 @@ export default function PrinterManagementPage(props){
         }).catch((error)=>{
             console.error(error);
         })
-        
     }
+
+    function checkBeforeDeletingPrinter(id){
+        setDeleteModal(<ExtraConfirmModal confirmPhrase={"Delete this printer"} onConfirm={()=>deletePrinter(id)} onCancel={()=>setDeleteModal(null)} message={"Are you sure you want to delete this printer? This will remove all maintenance logs associated with this printer. Are you sure?"}/>)
+    }
+
+    function deletePrinter(id){
+        let deletePrinter = httpsCallable(functions, "deletePrinter");
+        deletePrinter({id: id}).then((result)=>{
+            if(result.data.error){
+                console.error(result.data.message)
+            } else {
+                setPrinters(printers.filter((printer)=>printer.id!=id))
+            }
+            setDeleteModal(null)
+        }).catch((error)=>{
+            console.error(error);
+        })
+    }
+
+
 
     return (
         <>
@@ -132,7 +151,7 @@ export default function PrinterManagementPage(props){
                     {
                         printers ? printers.map((printer) => {
                             return (
-                                <p>{printer.id}</p>
+                                <><p><IconButton onClick={()=>checkBeforeDeletingPrinter(printer.id)}><Delete/></IconButton>{printer.id}</p></>
                             )
                         }):<LinearProgress/>
                     }
