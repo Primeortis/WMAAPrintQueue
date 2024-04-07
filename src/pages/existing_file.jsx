@@ -81,7 +81,7 @@ export default function ExistingFilePage(props){
       if(filename.length < 1){filename=pathsArr[pathsArr.length-2]}
       console.log(filename);
       let docReference = doc(db, "files", filename);
-      navigate("/print?file=" + docReference.id);
+      navigate("/print?file=" + docReference.id+"&name="+encodeURIComponent(docData.name));
     }
 
     return (

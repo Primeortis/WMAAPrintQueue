@@ -3,7 +3,7 @@ import { Box, Button, Modal, LinearProgress, TextField, Select, MenuItem } from 
 import styles from "../pagestyles.module.css"
 import File from "../../components/file.jsx";
 import { useEffect, useState } from "react";
-import { getFirestore, collection, query, where, getDocs, addDoc, doc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, addDoc, doc, serverTimestamp, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { firebaseApp } from "../firebase-config.js";
 import NorthEastIcon from '@mui/icons-material/NorthEast';
@@ -43,16 +43,14 @@ const NewPrintPage = () => {
         let params = new URLSearchParams(window.location.search);
         if(params.get("file")){
           let fileID = params.get("file");
+          let fileName = params.get("name")
           console.log("Caught File: " + fileID);
           setSelectedFileID(fileID);
           console.log("selectedFileID: " + selectedFileID);
-          const db = getFirestore(firebaseApp);
-          let docReference = doc(db, "files", selectedFileID);
-          setSelectedFile(docReference.name);
-          console.log("selectedFile: " + selectedFile + "\n selectedFileID: " + selectedFileID);
+          setSelectedFile(fileName);
         }//*/
       }checkFileParams();
-    }, [])
+    }, [selectedFileID, selectedFile])
 
     function onOpenButtonClicked(){
         const db = getFirestore(firebaseApp);
