@@ -108,10 +108,14 @@ export default function NewFilePage(props){
       let date = new Date();
       let filename = date.toISOString() + "!!" + auth.currentUser.uid + ".stl";
       setInfo(<Alert severity="info">Uploading File...</Alert>)
+      if(!navigator.onLine){
+        setInfo(<Alert severity="error">You are not connected to the internet. Please try again later.</Alert>)
+        return;
+      }
       uploadBytes(ref(storage, filename), files).then(async (snapshot)=> {
         console.log("complete");
         console.log(snapshot)
-        setInfo(<Alert severity="success">File Upload Complete! Placing finishing touches...</Alert>)
+        setInfo(<Alert severity="success">File Upload Complete! One more moment and you'll be printing...</Alert>)
         await setDoc(doc(db, "files", filename), {
           name: name,
           desc: desc,
@@ -122,6 +126,10 @@ export default function NewFilePage(props){
         })
         setInfo(<Alert severity="success">File Upload Complete!</Alert>)
         navigate("/file/"+filename);
+      }).catch((e)=> {
+        setInfo(<Alert severity="error">An error occured while uploading your file. Please try again later.</Alert>)
+        console.error(e);
+        return;
       })
     }
 

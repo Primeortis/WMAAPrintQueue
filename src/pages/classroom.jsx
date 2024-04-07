@@ -3,7 +3,7 @@ import styles from '../pagestyles.module.css';
 import {getAuth} from 'firebase/auth';
 import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
 import { firebaseApp } from '../firebase-config';
-import { Button, IconButton, MenuItem, Select,Modal, Box, TextField } from '@mui/material';
+import { Button, IconButton, MenuItem, Select,Modal, Box, TextField, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import SchoolIcon from '@mui/icons-material/School';
 import PersonIcon from '@mui/icons-material/Person';
@@ -21,12 +21,15 @@ import BuildIcon from '@mui/icons-material/Build';
 function QueueRow(props){
     let [expanded, setExpanded] = useState(false);
     let [stlURL, setSTLURL] = useState("");
+    let [feedback, setFeedback] = useState(null);
     const storage = getStorage(firebaseApp);
     useEffect(()=> {
         getDownloadURL(ref(storage, props.data.fileID)).then((url)=> {
             setSTLURL(url);
         }).catch((err)=> {
+            setSTLURL("error")
             console.error(err);
+            setFeedback(<Alert severity="error">An error occurred while trying to fetch the file. The file may have been deleted by the author.</Alert>)
         })
     }, [])
     if(props.data){
@@ -44,6 +47,7 @@ function QueueRow(props){
                 <IconButton onClick={()=>setExpanded(!expanded)}>{expanded?<ExpandLessIcon/>:<ExpandMoreIcon/>}</IconButton>
             </div>
             <div style={{display: expanded?"inline":"none"}}>
+                {feedback}
                 <p>Print Name: {props.data.name}</p>
                 <p>Material: {props.data.material}</p>
                 <p>Description: {props.data.description}</p>
@@ -59,7 +63,7 @@ function QueueRow(props){
                 }
                 <p>Timestamp: {dateString} {timeString}</p>
                 <p>Status: {props.data.status}</p>
-                <a href={stlURL} download={props.data.name+".stl"}><Button variant="contained">Download File</Button></a>
+                <a href={stlURL!="error"?stlURL:"javascript:function() { return false; }"} download={props.data.name+".stl"}><Button variant="contained" style={{cursor:stlURL!="error"?"pointer":"default"}} disabled={stlURL=="error"}>Download File</Button></a>
                 <Button variant="contained">Advance Status</Button>
             </div>
             </>
