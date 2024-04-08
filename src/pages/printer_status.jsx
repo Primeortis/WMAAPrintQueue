@@ -124,7 +124,8 @@ export default function PrinterStatus(props){
             let docs = [];
             querySnapshot.forEach((doc)=> {
                 let data = doc.data();
-                docs.push(<p key={data.date}>{data.user} {data.date}: {data.message}</p>)
+                let date = new Date(data.date)
+                docs.push(<p key={data.date}>{data.user} {date.toLocaleDateString() + " " + date.toLocaleTimeString()}: {data.message}</p>)
             })
             console.log(docs)
             if(docs.length ==0){
