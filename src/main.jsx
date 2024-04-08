@@ -4,6 +4,8 @@ import App from './App.jsx'
 import Error from "./Error.jsx"
 import PausedPage from './pages/paused.jsx'
 import './index.css'
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import AuthPage from './pages/auth.jsx'
 import ProfilePage from './pages/profile.jsx'
@@ -112,6 +114,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <RouterProvider router={router} />
+    </LocalizationProvider>
   </React.StrictMode>,
 )

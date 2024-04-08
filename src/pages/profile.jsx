@@ -8,7 +8,8 @@ import { useEffect, useState } from "react";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 export default function ProfilePage(props){
-    let [userRole, setUserRole] = useState("")
+    let [userRole, setUserRole] = useState("");
+    let [clipboardFeedback, setClipboardFeedback] = useState("Click to Copy");
 
     let navigate = useNavigate();
     const auth = getAuth(firebaseApp);
@@ -52,6 +53,15 @@ export default function ProfilePage(props){
         setRole(userInformation.uid, "pending");
     }
 
+    function copyUserID(){
+        navigator.clipboard.writeText(auth.currentUser.uid).then(()=> {
+          setClipboardFeedback("Copied!")
+          setTimeout(()=>setClipboardFeedback("Click to Copy"), 2000)
+        }).catch((error)=> {
+          setClipboardFeedback("Error sending your ID to the clipboard");
+        })
+    }
+
     return (
         <>
           <Navbar admin={true}/>
@@ -59,7 +69,7 @@ export default function ProfilePage(props){
             <h1>Hello {userInformation.displayName}!</h1>
             <div className={styles.popout} style={{textAlign:"left"}}>
               <p>Email: {userInformation.email}</p>
-              <p>User ID: {userInformation.uid} (Click to Copy)</p>
+              <p onClick={copyUserID} style={{cursor:"pointer"}}>User ID: {userInformation.uid} ({clipboardFeedback})</p>
               <p>Status: {userRole}</p>
               <Button variant="contained" onClick={signOutButton}>Sign Out</Button>
             </div>

@@ -21,6 +21,7 @@ export default function UserManagementPage(props){
     let [modal2Message, setModal2Message] = useState("");
     let [userLevel, setUserLevel] = useState(null);
     let [error, setError] = useState(null);
+    
     let navigate = useNavigate();
 
     // REMOVE BELOW IN PRODUCTION
@@ -90,6 +91,17 @@ export default function UserManagementPage(props){
         setModal2Open(false);
     }
 
+    function copyUserID() {
+        navigator.clipboard.writeText(userInformation.uid)
+            .then(() => {
+                console.log("Success in copying the result")
+            })
+            .catch((error) => {
+                setAlert("Failed to copy the User ID into your clipboard.")
+                console.error("Failed to copy User ID to clipboard:", error);
+            });
+    }
+
     return (
         <>
             <Navbar admin={true}/>
@@ -128,6 +140,7 @@ export default function UserManagementPage(props){
                         :null}
                         <Button variant="contained" onClick={pauseUserButton}>{userInformation.disabled?"Unpause User":"Pause User"}</Button>
                         {modal2Open?<ConfirmModal message={modal2Message} onConfirm={pauseUser} onCancel={()=>{setModal2Open(false)}}/>:null}
+                        <Button variant="contained" onClick={copyUserID}>Copy User ID</Button>
                         </>
                     :<p>Enter a search query above...</p>}
                 </div>
