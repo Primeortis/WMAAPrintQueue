@@ -304,24 +304,30 @@ const ClassroomPage = () => {
     function updatePrinterState(){
         const db = getFirestore(firebaseApp);
         const ref = doc(db, "printers", printerBeingEdited);
-        async function updateState(){
+        console.log(newPrinterState)
+        async function updateStateOnFirestore(){
             let regex = new RegExp("^\\d{2}:\\d{2}$");
-            if(!regex.test(pendingPrinterTime)){
+            if(newPrinterState == "printing" && !regex.test(pendingPrinterTime)){
+                console.log("stop")
                 return;
             }
-            if(newPrinterState == "printing"){
-                let time = pendingPrinterTime.split(":");
-                let hours = parseInt(time[0]);
-                let minutes = parseInt(time[1]);
-                let currentTime = new Date();
-                currentTime.setHours(currentTime.getHours() + hours);
-                currentTime.setMinutes(currentTime.getMinutes() + minutes);
-                await setDoc(ref, {status: newPrinterState, timeToDone: currentTime.toISOString()}, {merge: true});
-            } else {
-                await setDoc(ref, {status: newPrinterState, timeToDone: "none"}, {merge: true});
+            try {
+                if(newPrinterState == "printing"){
+                    let time = pendingPrinterTime.split(":");
+                    let hours = parseInt(time[0]);
+                    let minutes = parseInt(time[1]);
+                    let currentTime = new Date();
+                    currentTime.setHours(currentTime.getHours() + hours);
+                    currentTime.setMinutes(currentTime.getMinutes() + minutes);
+                    await setDoc(ref, {status: newPrinterState, timeToDone: currentTime.toISOString()}, {merge: true});
+                } else {
+                    await setDoc(ref, {status: newPrinterState, timeToDone: "none"}, {merge: true});
+                }
+            } catch (e){
+                console.error(e);
             }
         }
-        updateState();
+        updateStateOnFirestore();
         getPrinterStatuses()
         setNewPrinterStateModalOpen(false);
         
