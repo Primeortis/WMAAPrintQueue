@@ -145,3 +145,11 @@ exports.deletePrinter = onCall(async (request)=> {
         return {result:"Printer deleted successfully!", error:false}
     }
 })
+
+exports.checkadmin = onCall(async (request) => {
+    return {result:request.auth.token.role == "admin"};
+})
+
+exports.checkclassroom = onCall(async (request) => {
+    return {result:(request.auth.token.role == "admin" || request.auth.token.role == "classroom")};
+})

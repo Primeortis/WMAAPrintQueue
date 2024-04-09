@@ -3,16 +3,25 @@ import Navbar from "../../components/navbar/nav";
 import styles from "../pagestyles.module.css"
 import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth, signOut} from "firebase/auth"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
+import { useEffect } from "react";
 
 export default function AdminPage(props){
     const functions = getFunctions(firebaseApp);
     const auth = getAuth(firebaseApp);
+    const navigate = useNavigate();
 
     // REMOVE BELOW IN PRODUCTION
     connectFunctionsEmulator(functions, "localhost", 5001);
     // --------
+
+    useEffect(()=> {
+        let getAdmin = httpsCallable(functions, "checkadmin");
+        if(!getAdmin){
+            navigate("/profile");
+        }
+    }, []);
 
     return (
         <>
@@ -25,6 +34,7 @@ export default function AdminPage(props){
                     <Button variant="contained" component={Link} to="/admin/queuemanagement" style={{margin:".5em"}}>Rearrange Queue</Button>
                     <Button variant="contained" component={Link} to="/admin/fileviewer" style={{margin:".5em"}}>View All Files</Button>
                     <Button variant="contained" component={Link} to="/admin/printermanagement" style={{margin:".5em"}}>Manage Printers</Button>
+                    <Button variant="contained" component={Link} to="/classroom" style={{margin:".5em"}}>Go to Classroom Page</Button>
                 </div>
             </div>
         </>
