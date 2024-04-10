@@ -153,3 +153,9 @@ exports.checkadmin = onCall(async (request) => {
 exports.checkclassroom = onCall(async (request) => {
     return {result:(request.auth.token.role == "admin" || request.auth.token.role == "classroom")};
 })
+
+exports.upgradeUser = onCall(async (request) => {
+    //if(!request.auth.token.email.includes("@westmichiganaviation.org")) return {error:true, message:"Unauthorized"}
+    getAuth().setCustomUserClaims(request.auth.token.uid, {role: "student"});
+    return {error:false, message:"Success in setting role"}
+})

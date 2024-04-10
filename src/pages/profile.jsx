@@ -10,10 +10,12 @@ import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/
 export default function ProfilePage(props){
     let [userRole, setUserRole] = useState("");
     let [clipboardFeedback, setClipboardFeedback] = useState("Click to Copy");
+    
 
     let navigate = useNavigate();
     const auth = getAuth(firebaseApp);
     const functions = getFunctions(firebaseApp);
+    let params = new URLSearchParams(window.location.search);
 
     // REMOVE BELOW IN PRODUCTION
     connectFunctionsEmulator(functions, "localhost", 5001);
@@ -48,10 +50,6 @@ export default function ProfilePage(props){
     }
     console.log(userInformation);
     
-    if(!userInformation.role){
-        let setRole = httpsCallable(functions, "setrole");
-        setRole(userInformation.uid, "pending");
-    }
 
     function copyUserID(){
         navigator.clipboard.writeText(auth.currentUser.uid).then(()=> {
@@ -70,7 +68,7 @@ export default function ProfilePage(props){
             <div className={styles.popout} style={{textAlign:"left"}}>
               <p>Email: {userInformation.email}</p>
               <p onClick={copyUserID} style={{cursor:"pointer"}}>User ID: {userInformation.uid} ({clipboardFeedback})</p>
-              <p>Status: {userRole}</p>
+              <p>Status: {params.get("new")=="1"?"student":userRole}</p>
               <Button variant="contained" onClick={signOutButton}>Sign Out</Button>
             </div>
           </div>

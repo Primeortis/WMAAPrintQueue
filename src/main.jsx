@@ -26,6 +26,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import ClassroomPage from './pages/classroom.jsx'
+import NewUserLandingPage from './pages/newuserlanding.jsx'
 
 
 
@@ -79,6 +80,11 @@ const router = createBrowserRouter([
     path:"/print",
     element:<NewPrintPage/>,
     errorElement:<Error/>
+  },
+  {
+    path: "/newuserlanding",
+    element: <NewUserLandingPage/>,
+    errorElement: <Error/>
   },
   {
     path: "/classroom",

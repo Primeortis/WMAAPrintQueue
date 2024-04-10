@@ -22,7 +22,14 @@ export default function AuthPage(props){
             return signInWithPopup(auth, provider).then((result)=> {
                 let user = result.user; // TODO: add error handling for those not in WMAA email
                 let params = new URLSearchParams(window.location.search);
-                if(params.get("rd")&&params.get("rd")!="/auth"){navigate(params.get("rd"))}else{navigate("/")}
+                let customClaims = user.getIdTokenResult().then((idTokenResult)=> {
+                    if(idTokenResult.claims.role){ 
+                        if(params.get("rd")&&params.get("rd")!="/auth"){navigate(params.get("rd"))}else{navigate("/profile")}
+                    } else {
+                        navigate("/newuserlanding");
+                    }
+                })
+                
             }).catch((error)=> {
                 if(error.code == "auth/user-disabled"){
                     navigate("/paused");
