@@ -4,7 +4,7 @@ import styles from "../../pagestyles.module.css";
 import {firebaseApp} from "../../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
 import { useNavigate } from "react-router-dom";
-import {getFirestore, doc, getDocs, collection, query, orderBy, deleteDoc} from "firebase/firestore";
+import {getFirestore, doc, getDocs, collection, query, orderBy, deleteDoc, setDoc} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Delete } from "@mui/icons-material";
 import GradeIcon from '@mui/icons-material/Grade'; //star icon
@@ -12,14 +12,15 @@ import VisibilityIcon from '@mui/icons-material/Visibility'; // eye icon
 
 function Row(props){
     let [modalOpen, setModalOpen] = useState(false);
-
-    
-
+    let background = "#FAFAFA";
+    if(props.elevated){
+        background = "#faeecd";
+    }
     return (
         <>
-        <div className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} >
+        <div className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black", backgroundColor: background}}>
             <IconButton onClick={props.deleteEntry}><Delete/></IconButton>
-            <IconButton><GradeIcon/></IconButton>
+            <IconButton onClick={props.elevateEntry}><GradeIcon/></IconButton>
             <IconButton onClick={()=> {setModalOpen(true)}}><VisibilityIcon/></IconButton>
             <p className={styles.emP}>{props.data.userDisplayName}: {props.data.name}</p>
             <p>
@@ -60,6 +61,7 @@ export default function QueueManagementPage(props){
     let [categories, setCategories] = useState(null)
     let [selectedCategory, setSelectedCategory] = useState(null);
     let [queue, setQueue] = useState(null);
+    let [elevatedQueue, setElevatedQueue] = useState(null)
     
     useEffect(()=> {
         const db = getFirestore(firebaseApp);
@@ -84,7 +86,20 @@ export default function QueueManagementPage(props){
         deleteDoc(docRef).then(()=> {
             getQueueItems();
         }).catch((error)=> {
-            alert("Error deleting entry");
+            alert("Error deleting queue entry");
+            console.error(error);
+        })
+    }
+
+    function elevateEntry(id, alreadyElevated){
+        const db = getFirestore(firebaseApp);
+        const ref = doc(db, "categories", selectedCategory);
+        const queueRef = collection(ref, "prints");
+        const docRef = doc(queueRef, id);
+        setDoc(docRef, {elevated:!alreadyElevated}, {merge:true}).then(()=> {
+            getQueueItems();
+        }).catch((error)=> {
+            alert("Error elevating queue entry");
             console.error(error);
         })
     }
@@ -93,15 +108,27 @@ export default function QueueManagementPage(props){
         const db = getFirestore(firebaseApp);
         const ref = doc(db, "categories", selectedCategory)
         const queueRef = collection(ref, "prints");
-        const q = query(queueRef, orderBy("timestamp", "desc"));
+        const q = query(queueRef, orderBy("timestamp", "asc"));
         async function getQueue(){
             let querySnapshot = await getDocs(q);
             let docs = [];
+            let elevatedDocs = [];
             querySnapshot.forEach((doc)=> {
                 let data = doc.data();
-                docs.push(<Row data={data} deleteEntry={()=>deleteEntry(doc.id)}/>);
+                if(data.elevated){
+                    elevatedDocs.push(<Row data={data} deleteEntry={()=>deleteEntry(doc.id)} elevated={true} elevateEntry={()=>elevateEntry(doc.id, true)}/>);
+                } else {
+                    docs.push(<Row data={data} deleteEntry={()=>deleteEntry(doc.id)} elevated={false} elevateEntry={()=>elevateEntry(doc.id, false)}/>);
+                }
             })
-            setQueue(docs);
+            let final = [];
+            for(var i=0;i<elevatedDocs.length;i++){
+                final.push(elevatedDocs[i]);
+            }
+            for(var i=0;i<docs.length;i++){
+                final.push(docs[i]);
+            }
+            setQueue(final);
         }
         getQueue();
     }
@@ -124,7 +151,7 @@ export default function QueueManagementPage(props){
                         }
                     </Select>
                     <Button variant="contained" onClick={getQueueItems}>View Queue</Button>
-                    {queue?queue:<p><i>Nothing to show...</i></p>}
+                    {queue?<>{elevatedQueue}{queue}</>:<p><i>Nothing to show...</i></p>}
                 </div>
             </div>
         </>
