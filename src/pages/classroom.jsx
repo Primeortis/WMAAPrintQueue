@@ -1,9 +1,9 @@
 import {useState, useEffect} from 'react';
 import styles from '../pagestyles.module.css';
 import {getAuth} from 'firebase/auth';
-import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, setDoc, query, orderBy } from 'firebase/firestore';
 import { firebaseApp } from '../firebase-config';
-import { Button, IconButton, MenuItem, Select,Modal, Box, TextField, Alert } from '@mui/material';
+import { Button, IconButton, MenuItem, Select,Modal, Box, TextField, Alert } from '@mui/material'; 
 import { useNavigate } from 'react-router-dom';
 import SchoolIcon from '@mui/icons-material/School';
 import PersonIcon from '@mui/icons-material/Person';
@@ -36,6 +36,7 @@ function QueueRow(props){
         let date = props.data.timestamp.toDate();
         let dateString = date.toDateString();
         let timeString = date.toLocaleTimeString();
+        
         return (
             <>
             <div className={styles.rows}>
@@ -62,6 +63,7 @@ function QueueRow(props){
                     :null
                 }
                 <p>Timestamp: {dateString} {timeString}</p>
+                <p>Elevated: {props.data.elevated?"✅":"❌"}</p>
                 <p>Status: {props.data.status}</p>
                 <a href={stlURL!="error"?stlURL:"javascript:function() { return false; }"} download={props.data.name+".stl"}><Button variant="contained" style={{cursor:stlURL!="error"?"pointer":"default"}} disabled={stlURL=="error"}>Download File</Button></a>
                 <Button variant="contained">Advance Status</Button>
@@ -159,7 +161,7 @@ function PrinterRow(props){
 const ClassroomPage = () => {
     let goto = encodeURIComponent(window.location.pathname);
     let [categories, setCategories] = useState([]);
-    let [selectedCategory, setSelectedCategory] = useState("");
+    let [selectedCategory, setSelectedCategory] = useState(""); 
     let [selectedMenu, setSelectedMenu] = useState("queue");
     let [queueItems, setQueueItems] = useState([]);
     let [printers, setPrinters] = useState([]);
@@ -168,7 +170,7 @@ const ClassroomPage = () => {
     let [newMaintenanceMsg, setNewMaintenanceMsg] = useState("");
     let [newPrinterStateModalOpen, setNewPrinterStateModalOpen] = useState(false);
     let [newPrinterState, setNewPrinterState] = useState("");
-    let [pendingPrinterTime, setPendingPrinterTime] = useState("0:00");
+    let [pendingPrinterTime, setPendingPrinterTime] = useState("00:00");
     let [pendingPrinterTimeMsg, setPendingPrinterTimeMsg] = useState("");
     let [printerBeingEdited, setPrinterBeingEdited] = useState("");
 
@@ -247,16 +249,29 @@ const ClassroomPage = () => {
                 const db = getFirestore(firebaseApp);
                 const docref = doc(db, "categories", selectedCategory);
                 const queueRef = collection(docref, "prints");
-                const querySnapshot = await getDocs(queueRef);
+                const q = query(queueRef, orderBy("timestamp", "asc"));
+                const querySnapshot = await getDocs(q);
                 const queueDocs = [];
+                let elevatedDocs = [];
                 console.log(queueDocs)
                 querySnapshot.forEach((doc) => {
                     let data = doc.data();
-                    queueDocs.push({ id: doc.id, data: data });
+                    if(data.elevated){
+                        elevatedDocs.push({ id: doc.id, data: data });
+                    } else {
+                        queueDocs.push({ id: doc.id, data: data });
+                    }
                 });
+                let final = [];
+                for(let i=0; i<elevatedDocs.length; i++){
+                    final.push(elevatedDocs[i]);
+                }
+                for(let i=0; i<queueDocs.length; i++){
+                    final.push(queueDocs[i]);
+                }
                 // Render QueueRow components for each document in the queue
                 let items = [];
-                queueDocs.forEach((queueDoc) => {
+                final.forEach((queueDoc) => {
                     items.push(<QueueRow key={queueDoc.id} data={queueDoc.data} />)
                 })
                 if(items.length == 0) items.push(<p>No items in queue</p>)
