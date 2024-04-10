@@ -4,18 +4,23 @@ import styles from "../../pagestyles.module.css";
 import {firebaseApp} from "../../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
 import { useNavigate } from "react-router-dom";
-import {getFirestore, doc, getDocs, collection} from "firebase/firestore";
+import {getFirestore, doc, getDocs, collection, query, orderBy, deleteDoc} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Delete } from "@mui/icons-material";
-import AttachmentIcon from '@mui/icons-material/Attachment';
+import GradeIcon from '@mui/icons-material/Grade'; //star icon
+import VisibilityIcon from '@mui/icons-material/Visibility'; // eye icon
 
 function Row(props){
-    let [modalOpen, setModalOpen] = useState(false)
+    let [modalOpen, setModalOpen] = useState(false);
+
+    
+
     return (
         <>
-        <div className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} onClick={()=> {setModalOpen(true)}}>
-            <IconButton><Delete/></IconButton>
-            <IconButton><AttachmentIcon/></IconButton>
+        <div className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} >
+            <IconButton onClick={props.deleteEntry}><Delete/></IconButton>
+            <IconButton><GradeIcon/></IconButton>
+            <IconButton onClick={()=> {setModalOpen(true)}}><VisibilityIcon/></IconButton>
             <p className={styles.emP}>{props.data.userDisplayName}: {props.data.name}</p>
             <p>
                 <i>{props.data.classFor?props.data.classFor:"Personal Project"}</i>
@@ -71,21 +76,37 @@ export default function QueueManagementPage(props){
         getCategories();
     }, [])
 
+    function deleteEntry(id){
+        const db = getFirestore(firebaseApp);
+        const ref = doc(db, "categories", selectedCategory);
+        const queueRef = collection(ref, "prints");
+        const docRef = doc(queueRef, id);
+        deleteDoc(docRef).then(()=> {
+            getQueueItems();
+        }).catch((error)=> {
+            alert("Error deleting entry");
+            console.error(error);
+        })
+    }
+
     function getQueueItems(){
         const db = getFirestore(firebaseApp);
         const ref = doc(db, "categories", selectedCategory)
         const queueRef = collection(ref, "prints");
+        const q = query(queueRef, orderBy("timestamp", "desc"));
         async function getQueue(){
-            let querySnapshot = await getDocs(queueRef);
+            let querySnapshot = await getDocs(q);
             let docs = [];
             querySnapshot.forEach((doc)=> {
                 let data = doc.data();
-                docs.push(<Row data={data}/>);
+                docs.push(<Row data={data} deleteEntry={()=>deleteEntry(doc.id)}/>);
             })
             setQueue(docs);
         }
         getQueue();
     }
+
+    
 
     return (
         <>
