@@ -82,10 +82,16 @@ exports.getuserinformation = onCall(async (request) => {
         logger.log(e)
         return {result:{error:true, message:"User Not Found"}}; // result field for message, error field for error status
     }
+    let role = null;
+    try{
+        role = user.customClaims.role;
+    }catch (e){
+        role = "none";
+    }
     // remove unnecessary/possibly sensitive data
     let moduser = {
         error: false,
-        role: user.customClaims.role,
+        role: role,
         disabled: user.disabled,
         displayName: user.displayName,
         email: user.email,
@@ -110,6 +116,16 @@ exports.pauseuser = onCall(async (request) => {
     logger.log(request.data.disabled)
     getAuth().updateUser(request.data.uid, {disabled: request.data.disabled});
     return {result:"User paused state updated successfully!"}
+})
+
+exports.deleteuser = onCall(async (request) => {
+    // CHECK IF USER IS ADMIN
+    if(request.auth.token.role != "admin") return {error:true, message:"Unauthorized"}
+    // ---
+    if(request.data.uid.length < 5) return {result:"Invalid UID"}
+    logger.log(request.data.disabled)
+    getAuth().deleteUser(request.data.uid);
+    return {result:"User deleted successfully!"}
 })
 
 exports.deleteCategory = onCall(async (request)=> {

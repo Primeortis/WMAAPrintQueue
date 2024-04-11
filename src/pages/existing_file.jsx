@@ -13,15 +13,23 @@ import { getFirestore, getDoc, doc, deleteDoc } from "firebase/firestore";
 import {getStorage, ref, getDownloadURL, deleteObject } from "firebase/storage"
 import { StlViewer } from "react-stl-viewer";
 import ConfirmModal from "../../components/confirmModal.jsx";
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions"
 
 export default function ExistingFilePage(props){
     const iconButtonStyles = {width:"1.7em", height:"auto"}
     const db = getFirestore(firebaseApp);
     const storage = getStorage(firebaseApp);
+    const functions = getFunctions(firebaseApp);
     const navigate = useNavigate();
     let [docData, setDocData] = useState(null);
     let [stlURL, setSTLURL] = useState();
     let [confirmModal, setConfirmModal] = useState(null);
+    let [higherAccess, setAccess] = useState(false);
+
+    // REMOVE BELOW IN PRODUCTION
+    connectFunctionsEmulator(functions, "localhost", 5001);
+    // --------
+
     useEffect(()=> {
       let pathsArr = window.location.pathname.split("/");
       var filename = pathsArr[pathsArr.length-1];
@@ -47,6 +55,12 @@ export default function ExistingFilePage(props){
 
       getDocument();
 
+      async function checkAccess(){
+        let checkAdmin = httpsCallable(functions, "checkAdmin");
+        setAccess(checkAdmin());
+      }
+
+      checkAccess();
     }, [])
 
     function deleteDocumentButton(){
@@ -86,7 +100,7 @@ export default function ExistingFilePage(props){
 
     return (
         <>
-          <Navbar admin={true}/>
+          <Navbar/>
           {confirmModal}
           <div className={styles.body} style={{paddingTop:"10vh"}}>
             {docData?<>
@@ -95,9 +109,9 @@ export default function ExistingFilePage(props){
                 <div style={{textAlign:"left", display: "flex", flexDirection: "row", justifyContent:"center"}}>
 
                 <div className={styles.leftHalfScreen}>
+                    <p>{(higherAccess && (getAuth(firebaseApp).currentUser.displayName != docData.userName))?"User: " + docData.userName:""}</p>
                     <p>{docData.desc}</p>
-                    <p>Class: Robotics, Automation, and Manufacturing</p>
-                    <p>{docData.date}</p>
+                    <p>{"Uploaded On: " + docData.date}</p>
                     <div style={{display: "flex", flexDirection:"row", justifyContent:"space-evenly"}}>
                       <a href={stlURL} download={docData.name+".stl"}>
                       <IconButton>
@@ -110,7 +124,7 @@ export default function ExistingFilePage(props){
                       </IconButton>
                       
                       {
-                        docData.userID == getAuth(firebaseApp).currentUser.uid?
+                        docData.userID == getAuth(firebaseApp).currentUser.uid || higherAccess?
                         <>
                       <IconButton onClick={deleteDocumentButton}>
                         <DeleteIcon sx={iconButtonStyles}/>

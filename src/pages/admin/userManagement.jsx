@@ -18,7 +18,9 @@ export default function UserManagementPage(props){
     let [loadingInformation, setLoadingInformation] = useState(false);
     let [modal1Open, setModal1Open] = useState(false);
     let [modal2Open, setModal2Open] = useState(false);
+    let [modal3Open, setModal3Open] = useState(false);
     let [modal2Message, setModal2Message] = useState("");
+    let [modal3Message, setModal3Message] = useState("");
     let [userLevel, setUserLevel] = useState(null);
     let [error, setError] = useState(null);
     
@@ -69,6 +71,11 @@ export default function UserManagementPage(props){
         setModal2Open(true)
     }
 
+    function deleteUserButton(){
+        setModal3Message("Are you sure you want to delete the user?")
+        setModal3Open(true)
+    }
+
     function applyUserEdits(){
         let updateUser = httpsCallable(functions, "setrole");
         updateUser({uid: userInformation.uid, role: userLevel}).then((result)=>{
@@ -89,6 +96,43 @@ export default function UserManagementPage(props){
             console.error(error)
         })
         setModal2Open(false);
+    }
+
+    function deleteUser(){
+        let [files, setFiles] = useState([]);
+
+        /*async function getUserFiles(inputUID){
+          try {
+            var querySnapshot = await getDocs(q);
+          } catch (e){
+            console.error(e);
+            setFiles([""])
+            setFeedback(<Alert severity="error">An error occurred while trying to fetch your files. Please try again later.</Alert>)
+            return;
+          }
+          
+          console.log(querySnapshot);
+          let docs = [];
+          if(querySnapshot.docs.length == 0){navigate("/file/new");}
+          querySnapshot.forEach((doc)=> {
+            let data = doc.data();
+            docs.push(<File id={doc.id} name={data.name} date={data.date} key={doc.id}/>);
+          })
+          if(docs.length==0) navigate("/file/new");
+          setFiles(docs.reverse());
+        }
+        
+        getUserFiles();
+        for(let i = 0; i < files.length; i++) files[i].delete();//*/
+
+        let deleteUser = httpsCallable(functions, "deleteuser");
+        deleteUser({uid: userInformation.uid, disabled:!userInformation.disabled}).then((result)=>{
+            console.log(result)
+            setTimeout(()=>getUserInformation(), 500);
+        }).catch((error)=>{
+            console.error(error)
+        })
+        setModal3Open(false);
     }
 
     function copyUserID() {
@@ -140,6 +184,8 @@ export default function UserManagementPage(props){
                         :null}
                         <Button variant="contained" onClick={pauseUserButton}>{userInformation.disabled?"Unpause User":"Pause User"}</Button>
                         {modal2Open?<ConfirmModal message={modal2Message} onConfirm={pauseUser} onCancel={()=>{setModal2Open(false)}}/>:null}
+                        <Button variant="contained" onClick={deleteUserButton}>{"Delete User"}</Button>
+                        {modal3Open?<ConfirmModal message={modal3Message} onConfirm={deleteUser} onCancel={()=>{setModal3Open(false)}}/>:null}
                         <Button variant="contained" onClick={copyUserID}>Copy User ID</Button>
                         </>
                     :<p>Enter a search query above...</p>}
