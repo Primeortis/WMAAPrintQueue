@@ -20,6 +20,7 @@ import FileViewerPage from './pages/admin/viewAllFiles.jsx'
 import PrintViewerPage from './pages/admin/viewAllPrints.jsx'
 import NewPrintPage from './pages/newprint.jsx'
 import PrinterManagementPage from './pages/admin/printerManagement.jsx'
+import PrintConfirmed from './pages/printConfirmation.jsx'
 
 import {
   createBrowserRouter,
@@ -89,6 +90,11 @@ const router = createBrowserRouter([
   {
     path: "/classroom",
     element: <ClassroomPage/>, 
+    errorElement: <Error/>
+  },
+  {
+    path: "/printsuccess",
+    element: <PrintConfirmed/>, 
     errorElement: <Error/>
   },
   {

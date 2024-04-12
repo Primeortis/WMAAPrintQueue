@@ -151,6 +151,7 @@ export default function QueueManagementPage(props){
                         }
                     </Select>
                     <Button variant="contained" onClick={getQueueItems}>View Queue</Button>
+                    <Button variant="contained" onClick={()=>{navigate("/classroom")}}>Classroom Page</Button>
                     {queue?<>{elevatedQueue}{queue}</>:<p><i>Nothing to show...</i></p>}
                 </div>
             </div>

@@ -8,6 +8,7 @@ import { getAuth } from "firebase/auth";
 import { firebaseApp } from "../firebase-config.js";
 import NorthEastIcon from '@mui/icons-material/NorthEast';
 import {Link} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const NewPrintPage = () => {
     let [files, setFiles] = useState(null);
@@ -23,6 +24,7 @@ const NewPrintPage = () => {
     let [printMaterial, setPrintMaterial] = useState(null);
     let [printLocation, setPrintLocation] = useState(null);
     let [categories, setCategories] = useState(null);
+    var navigate = useNavigate();
 
     useEffect(()=> {
       const db = getFirestore(firebaseApp);
@@ -102,7 +104,6 @@ const NewPrintPage = () => {
         auth.currentUser.displayName
       ) {
         submitPrintData();
-        alert("Print submitted successfully!")
       } else {
         console.error("One or more values in printData are null");
         alert("You are missing a required value in the form. Please fill out all fields and try again.");
@@ -114,6 +115,7 @@ const NewPrintPage = () => {
           const ref = doc(db, "categories", printLocation)
           const docRef = await addDoc(collection(ref, 'prints'), {...printData, timestamp: serverTimestamp()});
           console.log("Print data submitted successfully with ID: ", docRef.id);
+          navigate("/printsuccess")
           // Add any additional logic or UI updates after successful submission
         } catch (error) {
           console.error("Error submitting print data: ", error);
