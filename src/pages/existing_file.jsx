@@ -56,7 +56,7 @@ export default function ExistingFilePage(props){
       getDocument();
 
       async function checkAccess(){
-        let checkAdmin = httpsCallable(functions, "checkAdmin");
+        let checkAdmin = httpsCallable(functions, "checkadmin");
         setAccess(checkAdmin());
       }
 

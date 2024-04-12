@@ -21,6 +21,8 @@ import PrintViewerPage from './pages/admin/viewAllPrints.jsx'
 import NewPrintPage from './pages/newprint.jsx'
 import PrinterManagementPage from './pages/admin/printerManagement.jsx'
 import PrintConfirmed from './pages/printConfirmation.jsx'
+import Error403Page from './pages/errorPages/error403.jsx'
+import Error404Page from './pages/errorPages/error404.jsx'
 
 import {
   createBrowserRouter,
@@ -120,6 +122,16 @@ const router = createBrowserRouter([
   {
     path:"/admin/printermanagement",
     element:<PrinterManagementPage/>,
+    errorElement:<Error/>
+  },
+  {
+    path:"/403",
+    element:<Error403Page/>,
+    errorElement:<Error/>
+  },
+  {
+    path:"/404",
+    element:<Error404Page/>,
     errorElement:<Error/>
   }
 ]);

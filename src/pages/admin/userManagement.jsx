@@ -8,12 +8,13 @@ import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/
 import { useState } from "react";
 import ConfirmModal from "../../../components/confirmModal.jsx";
 import Alert from '@mui/material/Alert';
-
+import { getFirestore, collection, getDocs, where, query, deleteDoc } from "firebase/firestore";
 
 export default function UserManagementPage(props){
     const auth = getAuth(firebaseApp);
     const functions = getFunctions(firebaseApp);
     let [userInformation, setUserInformation] = useState({});
+    let [files, setFiles] = useState([]);
     let [userIDOrEmail, setUserIDOrEmail] = useState("");
     let [loadingInformation, setLoadingInformation] = useState(false);
     let [modal1Open, setModal1Open] = useState(false);
@@ -23,7 +24,7 @@ export default function UserManagementPage(props){
     let [modal3Message, setModal3Message] = useState("");
     let [userLevel, setUserLevel] = useState(null);
     let [error, setError] = useState(null);
-    
+
     let navigate = useNavigate();
 
     // REMOVE BELOW IN PRODUCTION
@@ -99,9 +100,9 @@ export default function UserManagementPage(props){
     }
 
     function deleteUser(){
-        let [files, setFiles] = useState([]);
-
-        /*async function getUserFiles(inputUID){
+        /*async function getUserFiles(){
+          const db = getFirestore(firebaseApp);
+          const q = query(collection(db, "files"), where("userID", "==", userInformation.uid));
           try {
             var querySnapshot = await getDocs(q);
           } catch (e){
@@ -123,7 +124,12 @@ export default function UserManagementPage(props){
         }
         
         getUserFiles();
-        for(let i = 0; i < files.length; i++) files[i].delete();//*/
+        console.log(userInformation.uid);
+        console.log(files);
+        async function deleteFiles(){
+            for(let i = 0; i < files.length; i++) await deleteDoc(files[i]);
+        }
+        deleteFiles();//*/
 
         let deleteUser = httpsCallable(functions, "deleteuser");
         deleteUser({uid: userInformation.uid, disabled:!userInformation.disabled}).then((result)=>{
@@ -131,7 +137,7 @@ export default function UserManagementPage(props){
             setTimeout(()=>getUserInformation(), 500);
         }).catch((error)=>{
             console.error(error)
-        })
+        })//*/
         setModal3Open(false);
     }
 
@@ -163,9 +169,10 @@ export default function UserManagementPage(props){
                         <p>Display Name: {userInformation.displayName}</p>
                         <p>Paused? {userInformation.disabled.toString()}</p>
                         <p>Email: {userInformation.email}</p>
+                        <p>UID: {userInformation.uid}</p>
                         <p>Role: {userInformation.role}</p>
                         <p>Last Signed In At: {userInformation.lastSignIn}</p>
-                        <Button variant="contained" onClick={editUserButton}>Edit User</Button>
+                        <Button variant="contained" onClick={editUserButton}style={{margin:".5em"}}>Edit User</Button>
                         {modal1Open?
                             <Modal open={modal1Open} onClose={()=>{setModal1Open(false)}}>
                                 <Box sx={{width: "80%", backgroundColor:"rgba(91,91,91,0.8)", margin:"auto", padding:"2px", marginTop:"5vh"}}>
@@ -182,11 +189,11 @@ export default function UserManagementPage(props){
                                 </Box>
                             </Modal>
                         :null}
-                        <Button variant="contained" onClick={pauseUserButton}>{userInformation.disabled?"Unpause User":"Pause User"}</Button>
+                        <Button variant="contained" onClick={pauseUserButton} style={{margin:".5em"}}>{userInformation.disabled?"Unpause User":"Pause User"}</Button>
                         {modal2Open?<ConfirmModal message={modal2Message} onConfirm={pauseUser} onCancel={()=>{setModal2Open(false)}}/>:null}
-                        <Button variant="contained" onClick={deleteUserButton}>{"Delete User"}</Button>
+                        <Button variant="contained" onClick={deleteUserButton} style={{margin:".5em"}}>{"Delete User"}</Button>
                         {modal3Open?<ConfirmModal message={modal3Message} onConfirm={deleteUser} onCancel={()=>{setModal3Open(false)}}/>:null}
-                        <Button variant="contained" onClick={copyUserID}>Copy User ID</Button>
+                        <Button variant="contained" onClick={copyUserID} style={{margin:".5em"}}>Copy User ID</Button>
                         </>
                     :<p>Enter a search query above...</p>}
                 </div>
