@@ -18,7 +18,7 @@ function Row(props){
     }
     return (
         <>
-        <div className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black", backgroundColor: background}}>
+        <div className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"default", color:"black", backgroundColor: background}}>
             <IconButton onClick={props.deleteEntry}><Delete/></IconButton>
             <IconButton onClick={props.elevateEntry}><GradeIcon/></IconButton>
             <IconButton onClick={()=> {setModalOpen(true)}}><VisibilityIcon/></IconButton>
