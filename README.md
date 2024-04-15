@@ -1,5 +1,6 @@
 # WMAA Print and Queue Portal
 *A cloud portal designed to help queue prints from students, provide access control, among other features*
+  
 Features:
 - File storage of STL files
 - Queuing capabilities
