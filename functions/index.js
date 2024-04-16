@@ -14,6 +14,7 @@ const {onRequest, onCall, HttpsError} = require("firebase-functions/v2/https");
 const {initializeApp} = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getFirestore } = require("firebase-admin/firestore");
+const { getStorage } = require("firebase-admin/storage");
 const app = initializeApp();
 
 
@@ -26,7 +27,7 @@ async function deleteCollection(db, collectionRef, batchSize) {
     });
 }
 
-async function deleteQueryBatch(db, query, resolve) {
+async function deleteQueryBatch(db, query, resolve, deleteCorrespondingInStorage = false) {
     const snapshot = await query.get();
 
     const batchSize = snapshot.size;
@@ -39,6 +40,15 @@ async function deleteQueryBatch(db, query, resolve) {
     // Delete documents in a batch
     const batch = db.batch();
     snapshot.docs.forEach((doc) => {
+        if(deleteCorrespondingInStorage){
+            const storage = getStorage();
+            const file = storage.bucket().file(doc.data().filename);
+            file.delete().then(() => {
+                logger.log("File deleted successfully!");
+            }).catch((e) => {
+                logger.log(e);
+            });
+        }
         batch.delete(doc.ref);
     });
     await batch.commit();
@@ -135,7 +145,7 @@ exports.deleteuser = onCall(async (request) => {
     try {
         let collection = db.collection("files");
         let q = collection.where("userID", "==", request.data.uid);
-        deleteQueryBatch(db, q, 100);
+        deleteQueryBatch(db, q, 100, true);
     } catch (e){
         logger.log(e);
         return {error:true, message:e}
