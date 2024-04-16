@@ -5,7 +5,7 @@ import {firebaseApp} from "../../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
 import { useNavigate } from "react-router-dom";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ConfirmModal from "../../../components/confirmModal.jsx";
 import Alert from '@mui/material/Alert';
 import { getFirestore, collection, getDocs, where, query, deleteDoc } from "firebase/firestore";
@@ -30,6 +30,20 @@ export default function UserManagementPage(props){
     // REMOVE BELOW IN PRODUCTION
     connectFunctionsEmulator(functions, "localhost", 5001);
     // --------
+
+    useEffect(() => {
+        //Boot User if they aren't allowed
+        async function checkAdmin(){
+            let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+                if(!idTokenResult.claims.role == "admin"){ 
+                    navigate("/403");
+                }else{
+                    console.log("User is either admin or classroom: " + idTokenResult.claims.role);
+                }
+            });
+        }
+        checkAdmin();
+    });
 
     let emailRegex = new RegExp("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$");
 

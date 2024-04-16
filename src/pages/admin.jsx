@@ -4,23 +4,24 @@ import styles from "../pagestyles.module.css"
 import {firebaseApp} from "../../src/firebase-config.js"
 import {getAuth, signOut} from "firebase/auth"
 import { Link, useNavigate } from "react-router-dom";
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { useEffect } from "react";
 
 export default function AdminPage(props){
-    const functions = getFunctions(firebaseApp);
     const auth = getAuth(firebaseApp);
     const navigate = useNavigate();
 
-    // REMOVE BELOW IN PRODUCTION
-    connectFunctionsEmulator(functions, "localhost", 5001);
-    // --------
-
     useEffect(()=> {
-        let getAdmin = httpsCallable(functions, "checkadmin");
-        if(!getAdmin){
-            navigate("/profile");
+        //Boot User if they aren't allowed
+        async function checkAdmin(){
+            let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+                if(!idTokenResult.claims.role == "admin"){ 
+                    navigate("/403");
+                }else{
+                    console.log("User is either admin or classroom: " + idTokenResult.claims.role);
+                }
+            });
         }
+        checkAdmin();
     }, []);
 
     return (

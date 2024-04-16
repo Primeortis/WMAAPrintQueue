@@ -23,7 +23,9 @@ function QueueRow(props){
     let [stlURL, setSTLURL] = useState("");
     let [feedback, setFeedback] = useState(null);
     const storage = getStorage(firebaseApp);
+    const auth = getAuth(firebaseApp);
     useEffect(()=> {
+        console.log("Use Effect Run");
         getDownloadURL(ref(storage, props.data.fileID)).then((url)=> {
             setSTLURL(url);
         }).catch((err)=> {
@@ -217,6 +219,18 @@ const ClassroomPage = () => {
         // getting printer statuses
         
         if(printers.length==0) getPrinterStatuses();
+        
+        //Boot User if they aren't allowed
+        async function checkAdmin(){
+            let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+                if(!(idTokenResult.claims.role == "admin" || idTokenResult.claims.role == "classroom")){ 
+                    navigate("/403");
+                }else{
+                    console.log("User is either admin or classroom: " + idTokenResult.claims.role);
+                }
+            });
+        }
+        checkAdmin();
     }, [])
 
     function getMaintenanceLogs(printer){

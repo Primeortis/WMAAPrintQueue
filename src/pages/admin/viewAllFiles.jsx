@@ -45,6 +45,18 @@ export default function FileViewerPage(props){
         setFiles(docs.reverse());
       }
       if(files.length==0) getUserFiles();
+        
+      //Boot User if they aren't allowed
+      async function checkAdmin(){
+          let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+              if(!idTokenResult.claims.role == "admin"){ 
+                  navigate("/403");
+              }else{
+                  console.log("User is either admin or classroom: " + idTokenResult.claims.role);
+              }
+          });
+      }
+      checkAdmin();
     }, [])
 
     function searchFiles(){

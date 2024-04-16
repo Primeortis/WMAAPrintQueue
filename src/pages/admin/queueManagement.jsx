@@ -76,6 +76,18 @@ export default function QueueManagementPage(props){
             setCategories(docs);
         }
         getCategories();
+        
+        //Boot User if they aren't allowed
+        async function checkAdmin(){
+            let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+                if(!idTokenResult.claims.role == "admin"){ 
+                    navigate("/403");
+                }else{
+                    console.log("User is either admin or classroom: " + idTokenResult.claims.role);
+                }
+            });
+        }
+        checkAdmin();
     }, [])
 
     function deleteEntry(id){
