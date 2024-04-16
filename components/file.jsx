@@ -4,7 +4,7 @@ function File(props){
     let date = new Date(props.date);
     if(!props.onClick){
       return (
-        <Link className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} to={"/file/"+props.id}>
+        <Link className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} to={"/file/"+props.id+"?admin=false"}>
             <p className={styles.emP}>{props.name}</p>
             <p>
                 <i>{date.toLocaleDateString()} {date.toLocaleTimeString()}</i>

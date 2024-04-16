@@ -2,7 +2,7 @@ import { Button, LinearProgress, MenuItem, Select, TextField } from "@mui/materi
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Navbar from "../../../components/navbar/nav";
 import styles from "../../pagestyles.module.css"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {firebaseApp} from "../../../src/firebase-config.js"
 import {getAuth} from "firebase/auth"
@@ -12,7 +12,7 @@ function File(props){
   let date = new Date(props.date);
 
     return (
-      <Link className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} to={"/file/"+props.id}>
+      <Link className={[styles.rows, styles.dimOnHover].join(" ")} style={{cursor:"pointer", color:"black"}} to={"/file/"+props.id+"?admin=true"}>
           <p className={styles.emP}>{props.username}: {props.name}</p>
           <p>
               <i>{date.toLocaleDateString()} {date.toLocaleTimeString()}</i>
@@ -28,6 +28,7 @@ export default function FileViewerPage(props){
     let [startDate, setStartDate] = useState(null);
     let [endDate, setEndDate] = useState(null);
     let [showingQueryResults, setShowingQueryResults] = useState(false);
+    let navigate = useNavigate();
     useEffect(()=> {
       const db = getFirestore(firebaseApp);
       const auth = getAuth(firebaseApp);

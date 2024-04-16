@@ -83,7 +83,12 @@ export default function ExistingFilePage(props){
       if(filename.length < 1){filename=pathsArr[pathsArr.length-2]}
       deleteObject(ref(storage, filename)).then(async ()=> {
         await deleteDoc(doc(db, "files", filename));
-        navigate("/file");
+        let params = new URLSearchParams(window.location.search);
+        if(params.get("admin")=="true"){
+          navigate("/admin/fileviewer");
+        }else{
+          navigate("/file");
+        }
       }).catch((err)=> {
         alert("something went wrong")
       })
