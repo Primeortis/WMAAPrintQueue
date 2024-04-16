@@ -20,34 +20,34 @@ const app = initializeApp();
 
 async function deleteCollection(db, collectionRef, batchSize) {
     const query = collectionRef.orderBy('__name__').limit(batchSize);
-  
+
     return new Promise((resolve, reject) => {
-      deleteQueryBatch(db, query, resolve).catch(reject);
+    deleteQueryBatch(db, query, resolve).catch(reject);
     });
-  }
-
-async function deleteQueryBatch(db, query, resolve) {
-const snapshot = await query.get();
-
-const batchSize = snapshot.size;
-if (batchSize === 0) {
-    // When there are no documents left, we are done
-    resolve();
-    return;
 }
 
-// Delete documents in a batch
-const batch = db.batch();
-snapshot.docs.forEach((doc) => {
-    batch.delete(doc.ref);
-});
-await batch.commit();
+async function deleteQueryBatch(db, query, resolve) {
+    const snapshot = await query.get();
 
-// Recurse on the next process tick, to avoid
-// exploding the stack.
-process.nextTick(() => {
-    deleteQueryBatch(db, query, resolve);
-});
+    const batchSize = snapshot.size;
+    if (batchSize === 0) {
+        // When there are no documents left, we are done
+        resolve();
+        return;
+    }
+
+    // Delete documents in a batch
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+    });
+    await batch.commit();
+
+    // Recurse on the next process tick, to avoid
+    // exploding the stack.
+    process.nextTick(() => {
+        deleteQueryBatch(db, query, resolve);
+    });
 }
 
 exports.helloworld = onRequest(async (req, res)=> {
@@ -123,9 +123,26 @@ exports.deleteuser = onCall(async (request) => {
     if(request.auth.token.role != "admin") return {error:true, message:"Unauthorized"}
     // ---
     if(request.data.uid.length < 5) return {result:"Invalid UID"}
+    const db = getFirestore();
     logger.log(request.data.disabled)
-    getAuth().deleteUser(request.data.uid);
-    return {result:"User deleted successfully!"}
+    try {
+        getAuth().deleteUser(request.data.uid);
+    } catch (e){
+        logger.log(e)
+        return {error:true, message:e}
+    }
+
+    try {
+        let collection = db.collection("files");
+        let q = collection.where("userID", "==", request.data.uid);
+        deleteQueryBatch(db, q, 100);
+    } catch (e){
+        logger.log(e);
+        return {error:true, message:e}
+    }
+    
+
+    return {error:false, result:"User deleted successfully!"}
 })
 
 exports.deleteCategory = onCall(async (request)=> {
