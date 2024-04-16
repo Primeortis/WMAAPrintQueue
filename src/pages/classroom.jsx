@@ -17,7 +17,6 @@ import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import BuildIcon from '@mui/icons-material/Build';
 
 
-
 function QueueRow(props){
     let [expanded, setExpanded] = useState(false);
     let [stlURL, setSTLURL] = useState("");
