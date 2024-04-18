@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import styles from '../pagestyles.module.css';
 import {getAuth} from 'firebase/auth';
-import { getFirestore, collection, getDocs, doc, setDoc, query, orderBy, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, setDoc, query, orderBy, where, deleteDoc } from 'firebase/firestore';
 import { firebaseApp } from '../firebase-config';
 import { Button, IconButton, MenuItem, Select,Modal, Box, TextField, Alert } from '@mui/material'; 
 import { useNavigate } from 'react-router-dom';
@@ -53,6 +53,17 @@ function QueueRow(props){
         setStatus(statuses[currentStatus+1])
     }
 
+    function deleteEntry(){
+        const db = getFirestore(firebaseApp);
+        const ref = doc(db, "categories", props.category);
+        const q = collection(ref, "prints");
+        async function deleteDocument(){
+            await deleteDoc(doc(q, props.id));
+        }
+        deleteDocument();
+        setFeedback(<Alert severity="success">The entry has been deleted. Click the view button above to refresh this feed.</Alert>)
+    }
+
     if(props.data){
         let date = props.data.timestamp.toDate();
         let dateString = date.toDateString();
@@ -87,8 +98,9 @@ function QueueRow(props){
                 <p>Elevated: {props.data.elevated?"✅":"❌"}</p>
                 <p>Status: {status}</p>
                 {status=="printed"?<p><i>It looks like this item has been printed successfully. If you click the view button above to refresh this feed, this entry will disappear.</i></p>:null}
-                <a href={stlURL!="error"?stlURL:"javascript:function() { return false; }"} download={props.data.name+".stl"}><Button variant="contained" style={{cursor:stlURL!="error"?"pointer":"default"}} disabled={stlURL=="error"}>Download File</Button></a>
+                <a style={{cursor: stlURL!="error"?"pointer":"default"}} href={stlURL!="error"?stlURL:"javascript:function() { return false; }"} download={props.data.name+".stl"}><Button variant="contained" style={{cursor:stlURL!="error"?"pointer":"default"}} disabled={stlURL=="error"}>Download File</Button></a>
                 <Button variant="contained" onClick={advanceStatus}>Advance Status</Button>
+                {stlURL=="error"?<Button variant="contained" onClick={deleteEntry}>Delete Entry</Button>:null}
             </div>
             </>
         )
