@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import styles from '../pagestyles.module.css';
 import {getAuth} from 'firebase/auth';
-import { getFirestore, collection, getDocs, doc, setDoc, query, orderBy } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, setDoc, query, orderBy, where } from 'firebase/firestore';
 import { firebaseApp } from '../firebase-config';
 import { Button, IconButton, MenuItem, Select,Modal, Box, TextField, Alert } from '@mui/material'; 
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,7 @@ function QueueRow(props){
     let [expanded, setExpanded] = useState(false);
     let [stlURL, setSTLURL] = useState("");
     let [feedback, setFeedback] = useState(null);
+    let [status, setStatus] = useState(props.data.status);
     const storage = getStorage(firebaseApp);
     const auth = getAuth(firebaseApp);
     useEffect(()=> {
@@ -29,10 +30,29 @@ function QueueRow(props){
             setSTLURL(url);
         }).catch((err)=> {
             setSTLURL("error")
-            console.error(err);
-            setFeedback(<Alert severity="error">An error occurred while trying to fetch the file. The file may have been deleted by the author.</Alert>)
+            if(err.code == "storage/object-not-found"){
+                setFeedback(<Alert severity="error">The file associated with this entry could not be found. The file may have been deleted by the author.</Alert>)
+            } else {
+                console.error(err)
+                setFeedback(<Alert severity="error">An error occurred while trying to fetch the file. The file may have been deleted by the author.</Alert>)
+            }
         })
     }, [])
+
+    function advanceStatus(){
+        let statuses = ["pending", "printing", "printed"];
+        let currentStatus = statuses.indexOf(status);
+        console.log(currentStatus)
+        const db = getFirestore(firebaseApp);
+        const ref = doc(db, "categories", props.category);
+        const q = collection(ref, "prints");
+        async function updateStatus(){
+            await setDoc(doc(q, props.id), {status: statuses[currentStatus+1]}, {merge: true});
+        }
+        updateStatus();
+        setStatus(statuses[currentStatus+1])
+    }
+
     if(props.data){
         let date = props.data.timestamp.toDate();
         let dateString = date.toDateString();
@@ -65,14 +85,14 @@ function QueueRow(props){
                 }
                 <p>Timestamp: {dateString} {timeString}</p>
                 <p>Elevated: {props.data.elevated?"✅":"❌"}</p>
-                <p>Status: {props.data.status}</p>
+                <p>Status: {status}</p>
+                {status=="printed"?<p><i>It looks like this item has been printed successfully. If you click the view button above to refresh this feed, this entry will disappear.</i></p>:null}
                 <a href={stlURL!="error"?stlURL:"javascript:function() { return false; }"} download={props.data.name+".stl"}><Button variant="contained" style={{cursor:stlURL!="error"?"pointer":"default"}} disabled={stlURL=="error"}>Download File</Button></a>
-                <Button variant="contained">Advance Status</Button>
+                <Button variant="contained" onClick={advanceStatus}>Advance Status</Button>
             </div>
             </>
         )
     }
-
 }
 
 
@@ -262,7 +282,7 @@ const ClassroomPage = () => {
                 const db = getFirestore(firebaseApp);
                 const docref = doc(db, "categories", selectedCategory);
                 const queueRef = collection(docref, "prints");
-                const q = query(queueRef, orderBy("timestamp", "asc"));
+                const q = query(queueRef,where("status", "!=", "printed"), orderBy("timestamp", "asc"));
                 const querySnapshot = await getDocs(q);
                 const queueDocs = [];
                 let elevatedDocs = [];
@@ -285,7 +305,7 @@ const ClassroomPage = () => {
                 // Render QueueRow components for each document in the queue
                 let items = [];
                 final.forEach((queueDoc) => {
-                    items.push(<QueueRow key={queueDoc.id} data={queueDoc.data} />)
+                    items.push(<QueueRow key={queueDoc.id} category={selectedCategory} id={queueDoc.id} data={queueDoc.data} />)
                 })
                 if(items.length == 0) items.push(<p>No items in queue</p>)
                 setQueueItems(items);
