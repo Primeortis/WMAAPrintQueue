@@ -21,7 +21,7 @@ export default function PrinterManagementPage(props){
     let [printerModalOpen, setPrinterModalOpen] = useState(false);
     let [newCategoryComputerName, setNewCategoryComputerName] = useState("");
     let [newCategoryName, setNewCategoryName] = useState("");
-    let [newCategoryMinRole, setNewCategoryMinRole] = useState("");
+    let [newCategoryMinRole, setNewCategoryMinRole] = useState("student");
 
     let [newPrinterName, setNewPrinterName] = useState("");
     let [newPrinterCategory, setNewPrinterCategory] = useState("");
@@ -178,7 +178,13 @@ export default function PrinterManagementPage(props){
                                 <br/><br/>
                                 <TextField label="Computer Name" variant="outlined" style={{width: "50%", minWidth:"40px"}} value={newCategoryComputerName} onChange={(e)=>setNewCategoryComputerName(e.target.value)}/>
                                 <br/><br/>
-                                <TextField label="Minimum Role" variant="outlined" style={{width: "50%", minWidth:"40px"}} value={newCategoryMinRole} onChange={(e)=>setNewCategoryMinRole(e.target.value)}/>
+                                <Select label="Select Minimum Role" variant="outlined" style={{width: "25%", minWidth:"40px"}} value={newCategoryMinRole} onChange={(e)=>setNewCategoryMinRole(e.target.value)}>
+                                    <MenuItem value={"student"}>Student</MenuItem>
+                                    <MenuItem value={"apprentice"}>Apprentice</MenuItem>
+                                    <MenuItem value={"journeyman"}>Journeyman</MenuItem>
+                                    <MenuItem value={"master"}>Master</MenuItem>
+                                    <MenuItem value={"admin"}>Admin</MenuItem>
+                                </Select>
                                 <br/><br/>
                                 <Button variant="contained" onClick={submitNewCategory}>Create Category</Button>
                             </Box>
