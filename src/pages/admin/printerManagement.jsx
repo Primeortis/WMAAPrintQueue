@@ -39,6 +39,7 @@ export default function PrinterManagementPage(props){
                 let data = doc.data();
                 docs.push({id:doc.id, data:data});
             })
+            setNewPrinterCategory(docs[0].id)
             setCategories(docs);
         }
         getCategories();
