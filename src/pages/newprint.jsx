@@ -29,6 +29,16 @@ const NewPrintPage = () => {
     useEffect(()=> {
       const db = getFirestore(firebaseApp);
       const q = query(collection(db, "categories"))
+      const auth = getAuth(firebaseApp);
+      let role = "";
+      auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+        role = idTokenResult.claims.role;
+        console.log(role)
+      }).catch((err)=> {
+        console.error(err)
+      })
+      let roles = ["student", "apprentice", "journeyman", "master", "admin"];
+      
       async function getCategories(){
         console.log("getting categories")
           var querySnapshot = await getDocs(q);
@@ -36,6 +46,7 @@ const NewPrintPage = () => {
           let docs = [];
           querySnapshot.forEach((doc)=> {
           let data = doc.data();
+          if(roles.indexOf(role) < roles.indexOf(data.minRole)) return;
           docs.push(<MenuItem value={doc.id}>{data.name}</MenuItem>);
           })
           setCategories(docs);
