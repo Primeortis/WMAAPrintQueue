@@ -123,7 +123,11 @@ function StatusIcon(props){
 
 function PrinterRow(props){
     let [msg, setMsg] = useState("")
-    let [statusCode, setStatusCode] = useState(props.statusCode)
+    let [statusCode, setStatusCode] = useState(props.statusCode);
+    let [newPrinterStateModalOpen, setNewPrinterStateModalOpen] = useState(false);
+    let [pendingPrinterTime, setPendingPrinterTime] = useState("00:00");
+    let [pendingPrinterTimeMsg, setPendingPrinterTimeMsg] = useState("");
+    let [newPrinterState, setNewPrinterState] = useState(props.statusCode)
 
     function getTimeDifference(futureTimestamp) {
         const currentTime = new Date();
@@ -174,12 +178,55 @@ function PrinterRow(props){
             setMsg("Out of Service")
         }
     }, [msg, statusCode])
+
+    function setTimeField(input){
+        let regex = new RegExp("^\\d{2}:\\d{2}$");
+        if(regex.test(input)==false){
+            setPendingPrinterTimeMsg("Invalid Time Format - Follow the format hh:mm");
+        } else if(!input.includes(":")){
+            setPendingPrinterTimeMsg("Invalid Time Format - Include a colon between hours and minutes, even if hours is zero");
+        } else {
+            setPendingPrinterTimeMsg("");
+        }
+        setPendingPrinterTime(input);
+    }
+
+    function updatePrinterState(){
+        const db = getFirestore(firebaseApp);
+        const ref = doc(db, "printers", props.printer);
+        async function updateStateOnFirestore(){
+            let regex = new RegExp("^\\d{2}:\\d{2}$");
+            if(newPrinterState == "printing" && !regex.test(pendingPrinterTime)){
+                console.log("stop")
+                return;
+            }
+            try {
+                if(newPrinterState == "printing"){
+                    let time = pendingPrinterTime.split(":");
+                    let hours = parseInt(time[0]);
+                    let minutes = parseInt(time[1]);
+                    let currentTime = new Date();
+                    currentTime.setHours(currentTime.getHours() + hours);
+                    currentTime.setMinutes(currentTime.getMinutes() + minutes);
+                    await setDoc(ref, {status: newPrinterState, timeToDone: currentTime.toISOString()}, {merge: true});
+                } else {
+                    await setDoc(ref, {status: newPrinterState, timeToDone: "none"}, {merge: true});
+                }
+            } catch (e){
+                console.error(e);
+            }
+        }
+        updateStateOnFirestore();
+        setStatusCode(newPrinterState);
+        setNewPrinterStateModalOpen(false);
         
+    }
     
     return (
+        <>
         <div className={styles.rows}>
             <p className={styles.emP}>{props.printer}</p>
-            <p onClick={() => props.onStatusUpdate({statusCode: props.statusCode, name: props.printer})} style={{cursor: "pointer"}}>
+            <p onClick={()=>{setNewPrinterStateModalOpen(true)}} style={{cursor: "pointer"}}>
                 <StatusIcon status={statusCode}/>
                 <i>{msg}</i>
             </p>
@@ -187,6 +234,33 @@ function PrinterRow(props){
                 <BuildIcon/>
             </IconButton>
         </div>
+
+
+        <Modal open={newPrinterStateModalOpen} onClose={()=>{setNewPrinterStateModalOpen(false)}}>
+            <Box sx={{width: "80%", backgroundColor:"rgba(219,219,219,0.8)", margin:"auto", padding:"2px", marginTop:"5vh", color:"black"}}>
+                <h1>Set New Printer State</h1>
+                <p>{props.printer}</p>
+                <Select value={newPrinterState} onChange={(e)=>setNewPrinterState(e.target.value)}>
+                    <MenuItem value="printing">Printing</MenuItem>
+                    <MenuItem value="wait">Awaiting Print Removal</MenuItem>
+                    <MenuItem value="good">Ready to Print</MenuItem>
+                    <MenuItem value="no service">Out of Service</MenuItem>
+                </Select>
+                {newPrinterState=="printing"?
+                <>
+                <br/>
+                <br/>
+                <TextField label="Time to Print (hh:mm)" value={pendingPrinterTime} onChange={(e)=>setTimeField(e.target.value)}/>
+                {pendingPrinterTimeMsg}
+                </>
+                :
+                null
+                }
+                <br/>
+                <Button variant="contained" onClick={updatePrinterState}>Submit</Button>
+            </Box>
+        </Modal>
+        </>
     )
 }
 
@@ -219,7 +293,8 @@ const ClassroomPage = () => {
         let docs = [];
         querySnapshot.forEach((doc)=> {
             let data = doc.data();
-            docs.push(<PrinterRow printer={doc.id} statusCode={data.status} timeToDone={data.timeToDone} key={doc.id} onStatusUpdate={(state)=>{setPrinterBeingEdited(state.name);setNewPrinterState(state.statusCode);setNewPrinterStateModalOpen(true);}} onButtonClick={getMaintenanceLogs}/>)
+            docs.push({id:doc.id, data:data});
+            //docs.push(<PrinterRow printer={doc.id} statusCode={data.status} timeToDone={data.timeToDone} key={doc.id} onStatusUpdate={(state)=>{setPrinterBeingEdited(state.name);setNewPrinterState(state.statusCode);setNewPrinterStateModalOpen(true);}} onButtonClick={getMaintenanceLogs}/>)
         })
         setPrinters(docs);
     }
@@ -288,7 +363,6 @@ const ClassroomPage = () => {
 
 
     function viewQueueButton(){
-        
         async function viewQueue() {
             try {
                 const db = getFirestore(firebaseApp);
@@ -347,51 +421,9 @@ const ClassroomPage = () => {
         setMaintenanceModalOpen(false);
     }
 
-    function setTimeField(input){
-        let regex = new RegExp("^\\d{2}:\\d{2}$");
-        if(regex.test(input)==false){
-            setPendingPrinterTimeMsg("Invalid Time Format - Follow the format hh:mm");
-        } else if(!input.includes(":")){
-            setPendingPrinterTimeMsg("Invalid Time Format - Include a colon between hours and minutes, even if hours is zero");
-        } else {
-            setPendingPrinterTimeMsg("");
-        }
-        
-        
-        setPendingPrinterTime(input);
-    }
+    
 
-    function updatePrinterState(){
-        const db = getFirestore(firebaseApp);
-        const ref = doc(db, "printers", printerBeingEdited);
-        console.log(newPrinterState)
-        async function updateStateOnFirestore(){
-            let regex = new RegExp("^\\d{2}:\\d{2}$");
-            if(newPrinterState == "printing" && !regex.test(pendingPrinterTime)){
-                console.log("stop")
-                return;
-            }
-            try {
-                if(newPrinterState == "printing"){
-                    let time = pendingPrinterTime.split(":");
-                    let hours = parseInt(time[0]);
-                    let minutes = parseInt(time[1]);
-                    let currentTime = new Date();
-                    currentTime.setHours(currentTime.getHours() + hours);
-                    currentTime.setMinutes(currentTime.getMinutes() + minutes);
-                    await setDoc(ref, {status: newPrinterState, timeToDone: currentTime.toISOString()}, {merge: true});
-                } else {
-                    await setDoc(ref, {status: newPrinterState, timeToDone: "none"}, {merge: true});
-                }
-            } catch (e){
-                console.error(e);
-            }
-        }
-        updateStateOnFirestore();
-        getPrinterStatuses()
-        setNewPrinterStateModalOpen(false);
-        
-    }
+    
 
     return (
         <>
@@ -417,7 +449,11 @@ const ClassroomPage = () => {
 
 
                 <>
-                {printers}
+                {
+                printers.map((printer, index)=>{
+                    return <PrinterRow printer={printer.id} statusCode={printer.data.status} timeToDone={printer.data.timeToDone} key={doc.id} onButtonClick={getMaintenanceLogs}/>
+                })
+                }
                 </>
                 }
 
@@ -429,33 +465,6 @@ const ClassroomPage = () => {
                             {maintenanceLogs}
                             <TextField label="Add Maintenance Log Message" sx={{width: "90%"}} value={newMaintenanceMsg} onChange={(e)=>setNewMaintenanceMsg(e.target.value)}/>
                             <Button onClick={submitNewMaintenanceMessage}>Submit</Button>
-                        </Box>
-                    </Modal>
-                    
-
-                    
-                    <Modal open={newPrinterStateModalOpen} onClose={()=>{setNewPrinterStateModalOpen(false)}}>
-                        <Box sx={{width: "80%", backgroundColor:"rgba(219,219,219,0.8)", margin:"auto", padding:"2px", marginTop:"5vh", color:"black"}}>
-                            <h1>Set New Printer State</h1>
-                            <p>{printerBeingEdited}</p>
-                            <Select value={newPrinterState} onChange={(e)=>setNewPrinterState(e.target.value)}>
-                                <MenuItem value="printing">Printing</MenuItem>
-                                <MenuItem value="wait">Awaiting Print Removal</MenuItem>
-                                <MenuItem value="good">Ready to Print</MenuItem>
-                                <MenuItem value="no service">Out of Service</MenuItem>
-                            </Select>
-                            {newPrinterState=="printing"?
-                            <>
-                            <br/>
-                            <br/>
-                            <TextField label="Time to Print (hh:mm)" value={pendingPrinterTime} onChange={(e)=>setTimeField(e.target.value)}/>
-                            {pendingPrinterTimeMsg}
-                            </>
-                            :
-                            null
-                            }
-                            <br/>
-                            <Button variant="contained" onClick={updatePrinterState}>Submit</Button>
                         </Box>
                     </Modal>
                     
