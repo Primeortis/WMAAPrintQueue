@@ -53,9 +53,7 @@ function Navbar(props){
                 <LibraryAddIcon sx={iconStyles}/>
                 </IconButton>
             </Tooltip>
-            <Tooltip title="Messages" placement="right">
-            <NotificationsIcon sx={iconStyles}/>    
-            </Tooltip>
+            
             
             {isAdmin?
             <>
