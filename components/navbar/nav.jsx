@@ -6,7 +6,6 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HistoryIcon from '@mui/icons-material/History';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import SecurityIcon from '@mui/icons-material/Security';
 import { Link, useNavigate } from "react-router-dom";
 
@@ -19,7 +18,7 @@ function Navbar(props){
     let goto = encodeURIComponent(window.location.pathname);
     const auth = getAuth(firebaseApp);
     let navigate = useNavigate();
-    let iconStyles = {width:"65%", height:"auto", marginTop: "10px", marginBottom:"10px"};
+    let iconStyles = {width:"65%", height:"auto", marginTop: "10px", marginBottom:"10px", color:"#b0b0b0"};
     useEffect(()=> {
         console.log(goto);
         if(!auth.currentUser) navigate("/auth?rd="+ goto);
