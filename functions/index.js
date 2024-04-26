@@ -205,9 +205,6 @@ exports.deletePrinterLogs = onCall(async (request)=> {
     }
 })
 
-exports.checkadmin = onCall(async (request) => {
-    return {result:request.auth.token.role == "admin"};
-})
 
 exports.checkclassroom = onCall(async (request) => {
     return {result:(request.auth.token.role == "admin" || request.auth.token.role == "classroom")};
