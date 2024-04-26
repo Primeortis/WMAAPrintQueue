@@ -189,6 +189,22 @@ exports.deletePrinter = onCall(async (request)=> {
     }
 })
 
+exports.deletePrinterLogs = onCall(async (request)=> {
+    // CHECK IF USER IS ADMIN
+    if(request.auth.token.role != "admin") return {error:true, message:"Unauthorized"}
+    // ---
+
+    const db = getFirestore();
+    try {
+        const collectionRef = db.collection("printers").doc(request.data.id).collection("maintenance");
+        await deleteCollection(db, collectionRef, 100);
+    } catch(e){
+        return {error:true, message:e}
+    } finally {
+        return {result:"Logs deleted successfully!", error:false}
+    }
+})
+
 exports.checkadmin = onCall(async (request) => {
     return {result:request.auth.token.role == "admin"};
 })

@@ -1,4 +1,4 @@
-import { Button, Modal, Box, TextField, LinearProgress, IconButton, Select, MenuItem } from "@mui/material";
+import { Button, Modal, Box, TextField, LinearProgress, IconButton, Select, MenuItem, Alert } from "@mui/material";
 import Navbar from "../../../components/navbar/nav.jsx";
 import styles from "../../pagestyles.module.css";
 import {firebaseApp} from "../../firebase-config.js"
@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { Delete } from "@mui/icons-material";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import ConfirmModal, {ExtraConfirmModal} from "../../../components/confirmModal.jsx";
+import BuildIcon from '@mui/icons-material/Build';
 
 
 export default function PrinterManagementPage(props){
@@ -27,6 +28,9 @@ export default function PrinterManagementPage(props){
     let [newPrinterCategory, setNewPrinterCategory] = useState("");
     let [newPrinterMaterial, setNewPrinterMaterial] = useState("");
     let [deleteModal, setDeleteModal] = useState(null);
+    let [maintenanceModalOpen, setMaintenanceModalOpen] = useState("false");
+    let [maintenanceLogs, setMaintenanceLogs] = useState([]);
+    let [feedback, setFeedback] = useState(null)
     let userInformation = auth.currentUser;
     
     useEffect(()=> {
@@ -141,7 +145,59 @@ export default function PrinterManagementPage(props){
         })
     }
 
+    function openMaintenanceModal(printer){
+        const db = getFirestore(firebaseApp);
+        let q = doc(db, "printers", printer);
+        q = collection(q, "maintenance");
+        getDocs(q).then((querySnapshot)=>{
+            let docs = [];
+            querySnapshot.forEach((doc)=> {
+                let data = doc.data();
+                let date = new Date(data.date)
+                docs.push({user: data.user, date: date, message: data.message});
+            })
+            if(docs.length ==0){
+                docs.push({user: "none", date: new Date(), message: "No Maintenance Logs"});
+            }
+            setMaintenanceLogs(docs)
+            setMaintenanceModalOpen(printer);
+        }).catch((error)=>{
+            console.error(error)
+        })
+    }
 
+    function downloadMessages(){
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Maintenance Logs Exported " + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "\r\n";
+        csvContent += "User, Date, Message\r\n";
+        maintenanceLogs.forEach((log)=>{
+            let line = log.user + ", \"" + log.date.toLocaleDateString() + " " + log.date.toLocaleTimeString() + "\",\"" + log.message +"\"";
+            csvContent += line + "\r\n";
+        })
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "maintenanceLogs.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+
+    function deletePrinterLogs(){
+        let deleteLogs = httpsCallable(functions, "deletePrinterLogs");
+        deleteLogs({id: maintenanceModalOpen}).then((result)=>{
+            if(result.data.error){
+                console.error(result.data.message)
+            } else {
+                setMaintenanceModalOpen("false");
+                setMaintenanceLogs([]);
+                setFeedback(null);
+            }
+        }).catch((error)=>{
+            setMaintenanceModalOpen("false")
+            console.error(error);
+            setFeedback(<Alert severity="error">Error deleting logs</Alert>);
+        })
+    }
 
     return (
         <>
@@ -150,6 +206,7 @@ export default function PrinterManagementPage(props){
                 <h1>Manage Printers</h1>
                 <div className={styles.popout}>
                     {deleteModal}
+                    {feedback}
                     <h2>Printer Collections</h2>
                     {
                         categories ? categories.map((category) => {
@@ -164,7 +221,7 @@ export default function PrinterManagementPage(props){
                     {
                         printers ? printers.map((printer) => {
                             return (
-                                <><p><IconButton onClick={()=>checkBeforeDeletingPrinter(printer.id)}><Delete/></IconButton>{printer.id}</p></>
+                                <><p><IconButton onClick={()=>checkBeforeDeletingPrinter(printer.id)}><Delete/></IconButton>{printer.id}<IconButton onClick={()=> openMaintenanceModal(printer.id)}><BuildIcon/></IconButton></p></>
                             )
                         }):<LinearProgress/>
                     }
@@ -212,6 +269,19 @@ export default function PrinterManagementPage(props){
                                 <TextField label="Material" variant="outlined" style={{width: "50%", minWidth:"40px"}} value={newPrinterMaterial} onChange={(e)=>setNewPrinterMaterial(e.target.value)}/>
                                 <br/><br/>
                                 <Button variant="contained" onClick={submitNewPrinter}>Create Printer</Button>
+                            </Box>
+                        </Modal>
+                    :null}
+
+                    {maintenanceModalOpen != "false"?
+                        <Modal open={maintenanceModalOpen != "false"} onClose={()=>{setMaintenanceModalOpen("false")}}>
+                            <Box sx={{width: "80%", backgroundColor:"rgba(219,219,219,0.8)", margin:"auto", padding:"2px", marginTop:"5vh", color:"black", maxHeight:"80vh", overflowY:"scroll"}}>
+                                <h1>Maintenance Logs</h1>
+                                {maintenanceLogs.length>0?maintenanceLogs.map((log)=>{
+                                    return <p>{log.user} {log.date.toLocaleDateString() + " " + log.date.toLocaleTimeString()}: {log.message}</p>
+                                }):<LinearProgress/>}
+                                <Button variant="contained" onClick={()=> setFeedback(<ConfirmModal onConfirm={()=>deletePrinterLogs()} onCancel={()=>setFeedback(null)} message={"Are you sure you want to delete this printer's logs? This will remove all maintenance logs associated with this printer. Are you sure?"}/>)}>Delete All Messages</Button>
+                                <Button variant="contained" onClick={downloadMessages}>Download Messages</Button>
                             </Box>
                         </Modal>
                     :null}

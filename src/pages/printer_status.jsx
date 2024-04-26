@@ -165,13 +165,13 @@ export default function PrinterStatus(props){
                     {printers}
                 </div>
             </div>
-            {/*New Printer Modal*/}
+            {/*New Printer Maintenance Modal*/}
             {maintenanceModalOpen?
-                        <Modal open={maintenanceModalOpen!="false"} onClose={()=>{setMaintenanceModalOpen("false")}}>
-                            <Box sx={{width: "80%", backgroundColor:"rgba(219,219,219,0.8)", margin:"auto", padding:"2px", marginTop:"5vh", color:"black"}}>
+                        <Modal open={maintenanceModalOpen!="false"} onClose={()=>{setNewMaintenanceMsg("");setMaintenanceModalOpen("false")}}>
+                            <Box sx={{width: "80%", backgroundColor:"rgba(219,219,219,0.8)", margin:"auto", padding:"2px", marginTop:"5vh", color:"black", maxHeight:"80vh", overflowY:"scroll"}}>
                                 <h1>Maintenance Logs</h1>
                                 {maintenanceLogs}
-                                <TextField label="Add Maintenance Log Message" sx={{width: "90%"}} value={newMaintenanceMsg} onChange={(e)=>setNewMaintenanceMsg(e.target.value)}/>
+                                <TextField label="Add Maintenance Log Message" sx={{width: "90%"}} value={newMaintenanceMsg} onChange={(e)=>{if(e.target.value.length < 500)setNewMaintenanceMsg(e.target.value)}}/>
                                 <Button onClick={submitNewMaintenanceMessage}>Submit</Button>
                             </Box>
                         </Modal>
