@@ -10,6 +10,7 @@ import { getAuth } from "firebase/auth";
 import { firebaseApp } from "../firebase-config";
 import BuildIcon from '@mui/icons-material/Build';
 import { IconButton,Modal,Box, TextField, Button } from "@mui/material";
+import ReplayIcon from '@mui/icons-material/Replay';
 
 // TODO: make printer gear spin at some point?
 function StatusIcon(props){
@@ -99,6 +100,7 @@ export default function PrinterStatus(props){
     let [maintenanceModalOpen, setMaintenanceModalOpen] = useState("false");
     let [maintenanceLogs, setMaintenanceLogs] = useState([]);
     let [newMaintenanceMsg, setNewMaintenanceMsg] = useState("");
+    let [lastCheckedTime, setLastCheckedTime] = useState(new Date());
     
     useEffect(()=> {
         const db = getFirestore(firebaseApp);
@@ -111,6 +113,7 @@ export default function PrinterStatus(props){
                 docs.push(<PrinterRow printer={doc.id} statusCode={data.status} key={doc.id} timeToDone={data.timeToDone} onButtonClick={getMaintenanceLogs}/>)
             })
             setPrinters(docs);
+            setLastCheckedTime(new Date());
         }
         if(printers.length==0) getPrinterStatuses();
     }, [])
@@ -155,6 +158,22 @@ export default function PrinterStatus(props){
         setNewMaintenanceMsg("");
         setMaintenanceModalOpen(false);
     }
+    function reloadStatuses(){
+        const db = getFirestore(firebaseApp);
+        setPrinters([]);
+        async function getPrinterStatuses(){
+            const q = collection(db, "printers");
+            let querySnapshot = await getDocs(q);
+            let docs = [];
+            querySnapshot.forEach((doc)=> {
+                let data = doc.data();
+                docs.push(<PrinterRow printer={doc.id} statusCode={data.status} key={doc.id} timeToDone={data.timeToDone} onButtonClick={getMaintenanceLogs}/>)
+            })
+            setPrinters(docs);
+            setLastCheckedTime(new Date());
+        }
+        getPrinterStatuses();
+    }
 
     return (
         <>
@@ -163,6 +182,7 @@ export default function PrinterStatus(props){
                 <h1>Printer Status</h1>
                 <div className={styles.popout} style={{textAlign:"left"}}>
                     {printers}
+                    <p>Printer Status Last Checked at {lastCheckedTime.getHours()}:{lastCheckedTime.getMinutes()} <IconButton onClick={reloadStatuses}><ReplayIcon/></IconButton></p>
                 </div>
             </div>
             {/*New Printer Maintenance Modal*/}
