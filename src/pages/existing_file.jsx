@@ -56,11 +56,9 @@ export default function ExistingFilePage(props){
       getDocument();
 
       async function checkAccess(){
-        async function checkAdmin(){
-          let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
-              setAccess(idTokenResult.claims.role)
-          }).catch(err=> {navigate("/403")});
-        }
+        let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+            setAccess(idTokenResult.claims.role)
+        }).catch(err=> {navigate("/403")});
       }
       checkAccess();
     }, [])
