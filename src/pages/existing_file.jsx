@@ -56,8 +56,10 @@ export default function ExistingFilePage(props){
       getDocument();
 
       async function checkAccess(){
+        const auth = getAuth(firebaseApp);
         let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
-            setAccess(idTokenResult.claims.role)
+          console.log(idTokenResult.claims.role)
+            setAccess(idTokenResult.claims.role == "admin")
         }).catch(err=> {navigate("/403")});
       }
       checkAccess();
