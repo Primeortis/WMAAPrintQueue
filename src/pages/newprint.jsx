@@ -9,10 +9,13 @@ import { firebaseApp } from "../firebase-config.js";
 import NorthEastIcon from '@mui/icons-material/NorthEast';
 import {Link} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
+import { Category } from "@mui/icons-material";
 
 const NewPrintPage = () => {
     let [files, setFiles] = useState(null);
     let [modalOpen, setModalOpen] = useState(false);
+    let [infoModalOpen, setInfoModalOpen] = useState(false);
+    let [insufficeintRoleModalOpen, setInsufficeintRoleModalOpen] = useState(false);
     let [selectedFile, setSelectedFile] = useState(null);
     let [selectedFileID, setSelectedFileID] = useState(null);
     let [printName, setPrintName] = useState(null);
@@ -24,6 +27,7 @@ const NewPrintPage = () => {
     let [printMaterial, setPrintMaterial] = useState(null);
     let [printLocation, setPrintLocation] = useState(null);
     let [categories, setCategories] = useState(null);
+    let roles = ["norole", "student", "apprentice", "journeyman", "master", "admin"];
     var navigate = useNavigate();
 
     useEffect(()=> {
@@ -120,20 +124,33 @@ const NewPrintPage = () => {
         alert("You are missing a required value in the form. Please fill out all fields and try again.");
         return;
       }
+
       async function submitPrintData() {
         try {
           const db = getFirestore(firebaseApp);
-          const ref = doc(db, "categories", printLocation)
+          const ref = doc(db, "categories", printLocation);
+          
+          let userRole = "norole";
+
+          let tokenResult = await auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+            userRole = idTokenResult.claims.role;
+          });
+          tokenResult;
+          
+          if(roles.indexOf(ref.minrole) > roles.indexOf(userRole)) throw (new Error("User doesn't meet minimum role"));
+
           const docRef = await addDoc(collection(ref, 'prints'), {...printData, timestamp: serverTimestamp()});
           console.log("Print data submitted successfully with ID: ", docRef.id);
           navigate("/printsuccess")
           // Add any additional logic or UI updates after successful submission
         } catch (error) {
+          if(error = "User doesn't meet minimum role"){
+            setInsufficeintRoleModalOpen(true);
+          }
           console.error("Error submitting print data: ", error);
           // Handle the error or display an error message to the user
         }
       }
-
     }
 
 
@@ -187,9 +204,23 @@ const NewPrintPage = () => {
               <Select label="Select Printer Category" variant="outlined" style={{width: "25%", minWidth:"40px"}} value={printLocation} onChange={(e)=>{setPrintLocation(e.target.value)}}>
                 {categories?categories:<MenuItem value="loading">Loading...</MenuItem>}
               </Select>
-              <Button sx={{textTransform:"capitalize"}}>What does this mean? <NorthEastIcon/></Button>
+              <Button sx={{textTransform:"capitalize"}} onClick={() => setInfoModalOpen(true)}>What does this mean? <NorthEastIcon/></Button>
               <br/><br/>
               <Button variant="contained" color="primary" onClick={onSubmitButtonClicked}>Submit</Button>
+              <Modal open={infoModalOpen} onClose={() => setInfoModalOpen(false)}>
+                <Box sx={{width: "80%", backgroundColor:"rgba(91,91,91,0.8)", margin:"auto", padding:"2px", marginTop:"5vh"}}>
+                  <p>Check with your teacher to see what category you should use. <br/>
+                  Essentially, don't use the exclusive one for non school projects without permission.<br/>
+                  Choose whichever room would be most convenient for you to pick up at.</p>
+                </Box>
+              </Modal>
+              <Modal open={insufficeintRoleModalOpen} onClose={() => setInsufficeintRoleModalOpen(false)}>
+                <Box sx={{width: "80%", backgroundColor:"rgba(91,91,91,0.8)", margin:"auto", padding:"2px", marginTop:"5vh"}}>
+                  <p>
+                    Your role is insufficient to submit a print to {printLocation}, please change your selected category.
+                  </p>
+                </Box>
+              </Modal>
             </div>
           </div>
         </>
