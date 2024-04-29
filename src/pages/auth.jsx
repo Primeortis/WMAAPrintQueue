@@ -24,7 +24,7 @@ export default function AuthPage(props){
                 let params = new URLSearchParams(window.location.search);
                 let customClaims = user.getIdTokenResult().then((idTokenResult)=> {
                     if(idTokenResult.claims.role){ 
-                        if(params.get("rd")&&params.get("rd")!="/auth"){navigate(params.get("rd"))}else{navigate("/profile")}
+                        if(params.get("rd")&&params.get("rd")!="/auth"){navigate(params.get("rd"))}else{navigate("/file")}
                     } else {
                         navigate("/newuserlanding");
                     }

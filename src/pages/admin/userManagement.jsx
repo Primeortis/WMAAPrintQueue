@@ -22,7 +22,7 @@ export default function UserManagementPage(props){
     let [modal3Open, setModal3Open] = useState(false);
     let [modal2Message, setModal2Message] = useState("");
     let [modal3Message, setModal3Message] = useState("");
-    let [userLevel, setUserLevel] = useState(null);
+    let [userLevel, setUserLevel] = useState("apprentice");
     let [error, setError] = useState(null);
 
     let navigate = useNavigate();
@@ -114,37 +114,6 @@ export default function UserManagementPage(props){
     }
 
     function deleteUser(){
-        /*async function getUserFiles(){
-          const db = getFirestore(firebaseApp);
-          const q = query(collection(db, "files"), where("userID", "==", userInformation.uid));
-          try {
-            var querySnapshot = await getDocs(q);
-          } catch (e){
-            console.error(e);
-            setFiles([""])
-            setFeedback(<Alert severity="error">An error occurred while trying to fetch your files. Please try again later.</Alert>)
-            return;
-          }
-          
-          console.log(querySnapshot);
-          let docs = [];
-          if(querySnapshot.docs.length == 0){navigate("/file/new");}
-          querySnapshot.forEach((doc)=> {
-            let data = doc.data();
-            docs.push(<File id={doc.id} name={data.name} date={data.date} key={doc.id}/>);
-          })
-          if(docs.length==0) navigate("/file/new");
-          setFiles(docs.reverse());
-        }
-        
-        getUserFiles();
-        console.log(userInformation.uid);
-        console.log(files);
-        async function deleteFiles(){
-            for(let i = 0; i < files.length; i++) await deleteDoc(files[i]);
-        }
-        deleteFiles();//*/
-
         let deleteUser = httpsCallable(functions, "deleteuser");
         deleteUser({uid: userInformation.uid, disabled:!userInformation.disabled}).then((result)=>{
             console.log(result)

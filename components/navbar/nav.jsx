@@ -31,7 +31,9 @@ function Navbar(props){
     
     return (
         <nav className={styles.container} style={{position:"fixed", top:"0em"}}>
+            <IconButton component={Link} to={"/file"}>
             <img style={iconStyles} src="/wmaa.png"/>
+            </IconButton>
             <Tooltip title="Profile" placement="right">
                 <IconButton component={Link} to={"/profile"}>
                 <AccountCircleIcon sx={iconStyles}/>
@@ -43,7 +45,7 @@ function Navbar(props){
             </IconButton>
             </Tooltip>
             <Tooltip title="Files" placement="right">
-                <IconButton component={Link} to={"/file"}>
+                <IconButton component={Link} to={"/file/new"}>
                 <AttachFileIcon sx={iconStyles}/>
                 </IconButton>
             </Tooltip>

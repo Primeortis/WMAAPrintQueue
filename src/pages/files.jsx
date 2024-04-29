@@ -10,6 +10,7 @@ import File from "../../components/file";
 import { useNavigate } from "react-router-dom"
 
 export default function FilesPage(props){
+  const auth = getAuth(firebaseApp);
   let navigate = useNavigate();
   let [files, setFiles] = useState([]);
   let [feedback, setFeedback] = useState(null);
@@ -39,11 +40,13 @@ export default function FilesPage(props){
       }
       if(files.length==0) getUserFiles();
     }, [])
+    let user = auth.currentUser;
     return (
         <>
           <Navbar admin={true}/>
           <div className={styles.body} style={{paddingTop:"10vh"}}>
-            <h1>Your Files</h1>
+            <h1>Hello {user?user.displayName:null}!</h1>
+            <h2>Your Files</h2>
             <div className={styles.popout} style={{textAlign:"left"}}>
               {files.length>0?files:<LinearProgress />}
               <br/>
