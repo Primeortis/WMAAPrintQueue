@@ -424,15 +424,16 @@ const ClassroomPage = () => {
     
 
     
-
+    let tabbuttonstyle = {width: "49%", backgroundColor: "#bfbfbf", border: "2px black solid",padding: "10px", cursor: "pointer", color:"black"}
+    let toggledtabstyle = {borderBottom:"0px", backgroundColor:"#d9d9d9", borderBottomLeftRadius:"0px", borderBottomRightRadius:"0px"}
     return (
         <>
         <div className={styles.body} style={{paddingTop:"5vh"}}>
             <h1>Classroom Dashboard</h1>
             <div className={styles.popout}>
                 <div style={{display:"flex", justifyContent:"space-around", backgroundColor: "#bfbfbf"}}>
-                    <Button variant={selectedMenu=="queue"?"outlined":"contained"} onClick={()=>{setSelectedMenu("queue")}}>Queue</Button>
-                    <Button variant={selectedMenu=="printer"?"outlined":"contained"} onClick={()=>{setSelectedMenu("printer")}}>Printer Management</Button>
+                    <button onClick={()=>{setSelectedMenu("queue")}} style={{...tabbuttonstyle, ...(selectedMenu=="queue"?toggledtabstyle:{})}}>Queue</button>
+                    <button onClick={()=>{setSelectedMenu("printer")}} style={{...tabbuttonstyle, ...(selectedMenu=="printer"?toggledtabstyle:{})}}>Printer Management</button>
                 </div>
                 <br/>
                 {selectedMenu=="queue"?
@@ -447,7 +448,6 @@ const ClassroomPage = () => {
                 {queueItems}
                 </>:
 
-
                 <>
                 {
                 printers.map((printer, index)=>{
@@ -458,7 +458,6 @@ const ClassroomPage = () => {
                 }
 
 
-                    
                     <Modal open={maintenanceModalOpen!="false"} onClose={()=>{setMaintenanceModalOpen("false")}}>
                         <Box sx={{width: "80%", backgroundColor:"rgba(219,219,219,0.8)", margin:"auto", padding:"2px", marginTop:"5vh", color:"black"}}>
                             <h1>Maintenance Logs</h1>
@@ -467,8 +466,6 @@ const ClassroomPage = () => {
                             <Button onClick={submitNewMaintenanceMessage}>Submit</Button>
                         </Box>
                     </Modal>
-                    
-
 
             </div>
         </div>
