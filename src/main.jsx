@@ -29,6 +29,7 @@ import {
 } from "react-router-dom";
 import ClassroomPage from './pages/classroom.jsx'
 import NewUserLandingPage from './pages/newuserlanding.jsx'
+import OpenSource from './pages/opensource.jsx'
 
 
 
@@ -96,6 +97,11 @@ const router = createBrowserRouter([
   {
     path: "/printsuccess",
     element: <PrintConfirmed/>, 
+    errorElement: <Error/>
+  },
+  {
+    path:"/opensource",
+    element:<OpenSource/>,
     errorElement: <Error/>
   },
   {
