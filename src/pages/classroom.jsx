@@ -127,7 +127,8 @@ function PrinterRow(props){
     let [newPrinterStateModalOpen, setNewPrinterStateModalOpen] = useState(false);
     let [pendingPrinterTime, setPendingPrinterTime] = useState("00:00");
     let [pendingPrinterTimeMsg, setPendingPrinterTimeMsg] = useState("");
-    let [newPrinterState, setNewPrinterState] = useState(props.statusCode)
+    let [newPrinterState, setNewPrinterState] = useState(props.statusCode);
+    let [timeToDone, setTimeToDone] = useState(props.timeToDone);
 
     function getTimeDifference(futureTimestamp) {
         const currentTime = new Date();
@@ -148,7 +149,7 @@ function PrinterRow(props){
 
     setInterval(()=> {
         if(statusCode == "printing"){
-            let timeString = getTimeDifference(props.timeToDone);
+            let timeString = getTimeDifference(timeToDone);
             if(timeString == "The future timestamp is in the past"){
                 setStatusCode("wait");
                 return;
@@ -162,7 +163,7 @@ function PrinterRow(props){
     
     useEffect(()=> {
         if(props.statusCode == "printing"){
-            let timeString = getTimeDifference(props.timeToDone);
+            let timeString = getTimeDifference(timeToDone);
             if(timeString == "The future timestamp is in the past"){
                 statusCode = "wait";
             } else {
@@ -177,7 +178,7 @@ function PrinterRow(props){
         } else if(statusCode == "no service"){
             setMsg("Out of Service")
         }
-    }, [msg, statusCode])
+    }, [msg, statusCode, timeToDone])
 
     function setTimeField(input){
         let regex = new RegExp("^\\d{2}:\\d{2}$");
@@ -202,6 +203,7 @@ function PrinterRow(props){
             }
             try {
                 if(newPrinterState == "printing"){
+                    console.log(pendingPrinterTime)
                     let time = pendingPrinterTime.split(":");
                     let hours = parseInt(time[0]);
                     let minutes = parseInt(time[1]);
@@ -209,6 +211,7 @@ function PrinterRow(props){
                     currentTime.setHours(currentTime.getHours() + hours);
                     currentTime.setMinutes(currentTime.getMinutes() + minutes);
                     await setDoc(ref, {status: newPrinterState, timeToDone: currentTime.toISOString()}, {merge: true});
+                    setTimeToDone(currentTime.toISOString());
                 } else {
                     await setDoc(ref, {status: newPrinterState, timeToDone: "none"}, {merge: true});
                 }
