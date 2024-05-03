@@ -117,7 +117,7 @@ export default function UserManagementPage(props){
         let deleteUser = httpsCallable(functions, "deleteuser");
         deleteUser({uid: userInformation.uid, disabled:!userInformation.disabled}).then((result)=>{
             console.log(result)
-            setTimeout(()=>getUserInformation(), 500);
+            setTimeout(()=>getUserInformation(), 1000);
         }).catch((error)=>{
             console.error(error)
         })//*/

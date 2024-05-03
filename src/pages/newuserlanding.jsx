@@ -28,7 +28,7 @@ export default function NewUserLandingPage(props){
             console.log(e);
         }
           if(role){
-              navigate("/profile");
+              navigate("/file");
           }
     }, [])
 
@@ -38,13 +38,14 @@ export default function NewUserLandingPage(props){
         const functions = getFunctions(firebaseApp);
         const setRole = httpsCallable(functions, "upgradeUser");
         setRole().then((result)=> {
-            if(!result.error){
-                navigate("/profile?new=1");
+            console.log(result)
+            if(result.data.error == false){
+                navigate("/file");
             } else {
-                if(result.message == "Unauthorized"){
+                if(result.data.message == "Unauthorized"){
                     setUnauthorized(true);
+                    setLoading(false);
                     signOut(auth).then(()=> {
-                        setLoading(false);
                         setTimeout(()=>navigate("/auth"), 10000);
                     }).catch((e)=> {
                         console.error(e);
@@ -65,11 +66,11 @@ export default function NewUserLandingPage(props){
                 <br/>
                 <p style={{color:"black", fontSize:"1em"}}>Hey {username}! Thanks for trying us out! Here's a bit of information to get you started.</p>
                 <h1>HYPE TUTORIAL HERE</h1>
-                <Button variant="contained" color="primary" style={{margin:"10px"}} onClick={setRoleButton}>Get Started</Button>
+                <Button disabled={unauthorized} variant="contained" color="primary" style={{margin:"10px"}} onClick={setRoleButton}>Get Started</Button>
                 {loading?<LinearProgress/>:null}
                 <p style={{color:"black"}}><i>Questions? Contact your system administrator</i></p>
                 {unauthorized?<>
-                <p><em>Something went wrong activating your account, please ensure you are using a WMAA email address and are authorized to use this system.</em></p>
+                <p style={{color:"black"}}><em>Something went wrong activating your account, please ensure you are using a WMAA email address and are authorized to use this system.</em></p>
                 </>:null}
             </div>
         </Parent>

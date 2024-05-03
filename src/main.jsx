@@ -30,6 +30,7 @@ import {
 import ClassroomPage from './pages/classroom.jsx'
 import NewUserLandingPage from './pages/newuserlanding.jsx'
 import OpenSource from './pages/opensource.jsx'
+import AuthorizeUsersPage from './pages/admin/authorizeUsers.jsx'
 
 
 
@@ -127,6 +128,11 @@ const router = createBrowserRouter([
   {
     path:"/admin/printermanagement",
     element:<PrinterManagementPage/>,
+    errorElement:<Error/>
+  },
+  {
+    path:"/admin/authorize",
+    element:<AuthorizeUsersPage/>,
     errorElement:<Error/>
   },
   {

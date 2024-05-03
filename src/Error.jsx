@@ -5,7 +5,7 @@ function Error(props){
     return (
         <>
             <h1>Oops! Something went wrong.</h1>
-            <h1>{error.statusText || error.message}</h1>
+            <p style={{color:"black"}}>{error.statusText || error.message}</p>
         </>
     )
 }

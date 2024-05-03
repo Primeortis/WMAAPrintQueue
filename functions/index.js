@@ -112,11 +112,6 @@ exports.getuserinformation = onCall(async (request) => {
     return {result:moduser};
 })
 
-exports.handlenewuser = functions.auth.user().onCreate((user) => {
-    logger.log("New User Created: " + user.displayName);
-    getAuth().setCustomUserClaims(user.uid, {role: "pending"});
-    return {result:"New User Created: " + user.displayName};
-});
 
 exports.pauseuser = onCall(async (request) => {
     // CHECK IF USER IS ADMIN
@@ -211,7 +206,22 @@ exports.checkclassroom = onCall(async (request) => {
 })
 
 exports.upgradeUser = onCall(async (request) => {
-    //if(!request.auth.token.email.includes("@westmichiganaviation.org")) return {error:true, message:"Unauthorized"}
+    if(request.auth.token.email.slice(9) != "@westmichiganaviation.org") {
+        const db = getFirestore();
+        let authorized = db.collection("admin").doc("authorized");
+        let authorizedDoc = await authorized.get();
+        if(authorizedDoc.exists){
+            let data = authorizedDoc.data();
+            if(data.emails.includes(request.auth.token.email)) {
+                getAuth().setCustomUserClaims(request.auth.token.uid, {role: "student"});
+                return {error:false, message:"Success in setting role"}
+            } else {
+                return {error:true, message:"Unauthorized"}
+            }
+        } else {
+            return {error:true, message:"Something went wrong."}
+        }
+    }
     getAuth().setCustomUserClaims(request.auth.token.uid, {role: "student"});
     return {error:false, message:"Success in setting role"}
 })
