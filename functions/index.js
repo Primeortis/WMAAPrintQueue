@@ -206,7 +206,7 @@ exports.checkclassroom = onCall(async (request) => {
 })
 
 exports.upgradeUser = onCall(async (request) => {
-    if(request.auth.token.email.slice(9) != "@westmichiganaviation.org") {
+    if(request.auth.token.email.slice(-25) != "@westmichiganaviation.org") {
         const db = getFirestore();
         let authorized = db.collection("admin").doc("authorized");
         let authorizedDoc = await authorized.get();
