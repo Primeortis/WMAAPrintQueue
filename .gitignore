@@ -4,3 +4,4 @@ bun.lockb
 src/firebase-config.js
 firebase-debug.log
 ui-debug.log
+dist/
