@@ -48,7 +48,6 @@ export default function ProfilePage(props){
         </div>
       );
     }
-    console.log(userInformation);
     
 
     function copyUserID(){

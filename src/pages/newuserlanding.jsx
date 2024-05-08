@@ -65,7 +65,8 @@ export default function NewUserLandingPage(props){
             <div style={{backgroundColor:"#FAFAFA", width:"40%", margin:"auto", borderRadius:"10px", paddingBottom:"10px"}}>
                 <br/>
                 <p style={{color:"black", fontSize:"1em"}}>Hey {username}! Thanks for trying us out! Here's a bit of information to get you started.</p>
-                <h1>HYPE TUTORIAL HERE</h1>
+                <iframe style={{width:"35vw", height:"35vh"}} width="1280" height="720" src="https://www.youtube.com/embed/yvboTg4re8g" title="Using the WMAA Print Portal" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <br/>
                 <Button disabled={unauthorized} variant="contained" color="primary" style={{margin:"10px"}} onClick={setRoleButton}>Get Started</Button>
                 {loading?<LinearProgress/>:null}
                 <p style={{color:"black"}}><i>Questions? Contact your system administrator</i></p>
