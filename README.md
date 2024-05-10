@@ -17,3 +17,5 @@ Developed during Engineering Design and Development, 2024
 4. CD into functions directory and install cloud functions dependencies
 5. View development build (bun dev or vite run dev)
 6. Run the firebase cloud functions emulator (firebase start:emulators)
+
+Visit the Wiki to get help using the different features, and to read developer notes. 
