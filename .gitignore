@@ -5,3 +5,4 @@ src/firebase-config.js
 firebase-debug.log
 ui-debug.log
 dist/
+.firebase/hosting.ZGlzdA.cache
