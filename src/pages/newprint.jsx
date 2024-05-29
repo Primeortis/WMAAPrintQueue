@@ -3,7 +3,7 @@ import { Box, Button, Modal, LinearProgress, TextField, Select, MenuItem } from 
 import styles from "../pagestyles.module.css"
 import File from "../../components/file.jsx";
 import { useEffect, useState } from "react";
-import { getFirestore, collection, query, where, getDocs, addDoc, doc, serverTimestamp, getDoc } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, addDoc, doc, serverTimestamp, getDoc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { firebaseApp } from "../firebase-config.js";
 import NorthEastIcon from '@mui/icons-material/NorthEast';
@@ -141,6 +141,7 @@ const NewPrintPage = () => {
 
           const docRef = await addDoc(collection(ref, 'prints'), {...printData, timestamp: serverTimestamp()});
           console.log("Print data submitted successfully with ID: ", docRef.id);
+          await setDoc(doc(db, "files", selectedFileID), {lastPrintRequestDate: new Date().toISOString(), lastPrintRequest:printLocation+"|"+docRef.id}, {merge: true});
           navigate("/printsuccess")
           // Add any additional logic or UI updates after successful submission
         } catch (error) {
