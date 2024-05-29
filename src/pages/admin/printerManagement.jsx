@@ -218,16 +218,26 @@ export default function PrinterManagementPage(props){
                     <Button variant={"contained"} onClick={()=> {setModalOpen(true)}}>Add Category</Button>
                     <hr/>
                     <h2>Printers</h2>
-                    {
-                        printers ? printers.map((printer) => {
-                            return (
-                                <><p><IconButton onClick={()=>checkBeforeDeletingPrinter(printer.id)}><Delete/></IconButton>{printer.id}<IconButton onClick={()=> openMaintenanceModal(printer.id)}><BuildIcon/></IconButton></p></>
-                            )
-                        }):<LinearProgress/>
-                    }
+                    {categories && printers ? categories.map((category) => {
+                        const categoryPrinters = printers.filter((printer) => printer.data.category === category.id);
+                        return (
+                            <div key={category.id}>
+                                <h3>{category.id}</h3>
+                                {categoryPrinters.map((printer) => (
+                                    <p key={printer.id}>
+                                        <IconButton onClick={() => checkBeforeDeletingPrinter(printer.id)}>
+                                            <Delete/>
+                                        </IconButton>
+                                        {printer.id}
+                                        <IconButton onClick={() => openMaintenanceModal(printer.id)}>
+                                            <BuildIcon/>
+                                        </IconButton>
+                                    </p>
+                                ))}
+                            </div>
+                        );
+                    }) : <LinearProgress/>}
                     <Button variant={"contained"} onClick={()=>setPrinterModalOpen(true)}>Add Printer</Button>
-
-                    {/*New Category Modal*/}
                     {modalOpen?
                         <Modal open={modalOpen} onClose={()=>{setModalOpen(false)}}>
                             <Box sx={{width: "80%", backgroundColor:"rgba(91,91,91,0.8)", margin:"auto", padding:"2px", marginTop:"5vh"}}>
