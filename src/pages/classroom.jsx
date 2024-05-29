@@ -15,6 +15,7 @@ import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import CheckIcon from '@mui/icons-material/Check';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import BuildIcon from '@mui/icons-material/Build';
+import { set } from 'firebase/database';
 
 
 function QueueRow(props){
@@ -22,6 +23,9 @@ function QueueRow(props){
     let [stlURL, setSTLURL] = useState("");
     let [feedback, setFeedback] = useState(null);
     let [status, setStatus] = useState(props.data.status);
+    let [advanceModalOpen, setAdvanceModalOpen] = useState(false);
+    let [newPrinterState, setNewPrinterState] = useState("");
+    let [pendingPrinterTimeField, setTimeField] = useState("00:00");
     const storage = getStorage(firebaseApp);
     const auth = getAuth(firebaseApp);
     useEffect(()=> {
@@ -40,18 +44,55 @@ function QueueRow(props){
     }, [])
 
     function advanceStatus(){
+        if(status == "pending"){
+            setAdvanceModalOpen(true)
+        } else {
+            let statuses = ["pending", "printing", "printed"];
+            let currentStatus = statuses.indexOf(status);
+            const db = getFirestore(firebaseApp);
+            const ref = doc(db, "categories", props.category);
+            const q = collection(ref, "prints");
+            async function updateStatus(){ //update queue item
+                await setDoc(doc(q, props.id), {status: statuses[currentStatus+1], currentPrint: null}, {merge: true});
+            }
+            updateStatus();
+            setStatus(statuses[currentStatus+1])
+        }
+    }
+
+    function submitPrintingStatus(){
         let statuses = ["pending", "printing", "printed"];
         let currentStatus = statuses.indexOf(status);
         console.log(currentStatus)
+        let regex = new RegExp("^\\d{2}:\\d{2}$");
+        if(!regex.test(pendingPrinterTimeField)){
+            alert("Please enter a valid timestamp in the format hh:mm");
+            return;
+        }
+
+        let time = pendingPrinterTimeField.split(":");
+        let hours = parseInt(time[0]);
+        let minutes = parseInt(time[1]);
+        if(minutes <=0 || minutes >=60){
+            alert("Invalid time format");
+            return;
+        }
         const db = getFirestore(firebaseApp);
         const ref = doc(db, "categories", props.category);
         const q = collection(ref, "prints");
-        async function updateStatus(){
+        async function updateStatus(){ //update queue item
             await setDoc(doc(q, props.id), {status: statuses[currentStatus+1]}, {merge: true});
+            let currentTime = new Date();
+            currentTime.setHours(currentTime.getHours() + hours);
+            currentTime.setMinutes(currentTime.getMinutes() + minutes);
+            console.log(newPrinterState)
+            await setDoc(doc(collection(db, "printers"), newPrinterState), {status: "printing", timeToDone: currentTime.toISOString(), currentPrint: props.data.fileID}, {merge: true})
         }
         updateStatus();
-        setStatus(statuses[currentStatus+1])
+        setStatus(statuses[currentStatus+1]);
+        setAdvanceModalOpen(false);
     }
+
 
     function deleteEntry(){
         const db = getFirestore(firebaseApp);
@@ -101,6 +142,26 @@ function QueueRow(props){
                 <a style={{cursor: stlURL!="error"?"pointer":"default"}} href={stlURL!="error"?stlURL:"javascript:function() { return false; }"} download={props.data.name+".stl"}><Button variant="contained" style={{cursor:stlURL!="error"?"pointer":"default"}} disabled={stlURL=="error"}>Download File</Button></a>
                 <Button variant="contained" onClick={advanceStatus}>Advance Status</Button>
                 {stlURL=="error"?<Button variant="contained" onClick={deleteEntry}>Delete Entry</Button>:null}
+
+                {advanceModalOpen?
+                <Modal open={advanceModalOpen} onClose={()=>{setAdvanceModalOpen(false)}}>
+                <Box sx={{width: "80%", backgroundColor:"rgba(91,91,91,0.8)", margin:"auto", padding:"2px", marginTop:"5vh"}}>
+                    <h1>Advance Print</h1>
+                    <p>Select the printer this print will be sent to:</p>
+                    <Select value={newPrinterState} onChange={(e)=>setNewPrinterState(e.target.value)}>
+                        {props.printers.map((printer, index)=>{
+                            if(printer.data.category == props.category){
+                                return <MenuItem key={index} value={printer.id}>{printer.id}</MenuItem>
+                            }
+                        })}
+                    </Select>
+                    <p>Input time required for this print:</p>
+                    <TextField label="Time to Print (hh:mm)" value={pendingPrinterTimeField} onChange={(e)=>setTimeField(e.target.value)}/>
+                    <br/>
+                    <Button variant="contained" onClick={submitPrintingStatus}>Save</Button>
+                </Box>
+                </Modal>
+                :null}
             </div>
             </>
         )
@@ -394,7 +455,7 @@ const ClassroomPage = () => {
                 // Render QueueRow components for each document in the queue
                 let items = [];
                 final.forEach((queueDoc) => {
-                    items.push(<QueueRow key={queueDoc.id} category={selectedCategory} id={queueDoc.id} data={queueDoc.data} />)
+                    items.push(<QueueRow key={queueDoc.id} category={selectedCategory} id={queueDoc.id} data={queueDoc.data} printers={printers}/>)
                 })
                 if(items.length == 0) items.push(<p>No items in queue</p>)
                 setQueueItems(items);
