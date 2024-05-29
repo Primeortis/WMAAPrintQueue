@@ -7,6 +7,7 @@ import { Button, IconButton, MenuItem, Select,Modal, Box, TextField, Alert } fro
 import { useNavigate } from 'react-router-dom';
 import SchoolIcon from '@mui/icons-material/School';
 import PersonIcon from '@mui/icons-material/Person';
+import ReplayIcon from '@mui/icons-material/Replay'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import {getStorage, ref, getDownloadURL} from 'firebase/storage';
@@ -15,7 +16,6 @@ import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import CheckIcon from '@mui/icons-material/Check';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import BuildIcon from '@mui/icons-material/Build';
-import { set } from 'firebase/database';
 
 
 function QueueRow(props){
@@ -336,6 +336,7 @@ const ClassroomPage = () => {
     let [selectedMenu, setSelectedMenu] = useState("queue");
     let [queueItems, setQueueItems] = useState([]);
     let [printers, setPrinters] = useState([]);
+    let [printerLastCheckedTime, setLastCheckedTime] = useState(new Date());
     let [maintenanceModalOpen, setMaintenanceModalOpen] = useState("false");
     let [maintenanceLogs, setMaintenanceLogs] = useState([]);
     let [newMaintenanceMsg, setNewMaintenanceMsg] = useState("");
@@ -485,7 +486,22 @@ const ClassroomPage = () => {
         setMaintenanceModalOpen(false);
     }
 
-    
+    function reloadPrinterStatuses(){
+        const db = getFirestore(firebaseApp);
+        setPrinters([]);
+        async function getPrinterStatuses(){
+            const q = collection(db, "printers");
+            let querySnapshot = await getDocs(q);
+            let docs = [];
+            querySnapshot.forEach((doc)=> {
+                let data = doc.data();
+                docs.push({id:doc.id, data:data})
+            })
+            setPrinters(docs);
+            setLastCheckedTime(new Date());
+        }
+        getPrinterStatuses();
+    }
 
     
     let tabbuttonstyle = {width: "49%", backgroundColor: "#bfbfbf", border: "2px black solid",padding: "10px", cursor: "pointer", color:"black"}
@@ -518,6 +534,7 @@ const ClassroomPage = () => {
                     return <PrinterRow printer={printer.id} statusCode={printer.data.status} timeToDone={printer.data.timeToDone} key={doc.id} onButtonClick={getMaintenanceLogs}/>
                 })
                 }
+                <p>Printer Status Last Checked at {printerLastCheckedTime.getHours()}:{printerLastCheckedTime.getMinutes()} <IconButton onClick={reloadPrinterStatuses}><ReplayIcon/></IconButton></p>
                 </>
                 }
 
