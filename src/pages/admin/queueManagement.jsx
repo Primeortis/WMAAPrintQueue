@@ -26,6 +26,7 @@ function Row(props){
             <p>
                 <i>{props.data.classFor?props.data.classFor:"Personal Project"}</i>
             </p>
+            <p>{props.data.status}</p>
         </div>
         {modalOpen?
             <Modal open={modalOpen} onClose={()=>{setModalOpen(false)}}>
@@ -137,6 +138,7 @@ export default function QueueManagementPage(props){
             for(var i=0;i<elevatedDocs.length;i++){
                 final.push(elevatedDocs[i]);
             }
+            docs.reverse();
             for(var i=0;i<docs.length;i++){
                 final.push(docs[i]);
             }
